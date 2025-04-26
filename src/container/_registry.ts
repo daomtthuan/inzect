@@ -8,7 +8,6 @@ import { _RegistrationMap } from './_registration-map';
  * @internal
  */
 export class _Registry implements DependencyInjectionRegistry {
-  /** Registration Map. */
   #registrationMap = new _RegistrationMap();
 
   /** @inheritdoc */
@@ -57,14 +56,6 @@ export class _Registry implements DependencyInjectionRegistry {
     this.#registrationMap = new _RegistrationMap();
   }
 
-  /**
-   * Gets the registration for the token.\
-   * Ensures that the registration map contains the token. If the token is not in the map, initialize it with an empty array.
-   *
-   * @param token Injection token.
-   *
-   * @returns Registration.
-   */
   #getRegistrations<TType>(token: InjectionToken<TType>): Registration<TType>[] {
     if (!this.#registrationMap.has(token)) {
       this.#registrationMap.set(token, []);

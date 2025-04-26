@@ -13,7 +13,6 @@ import { _ResolutionContext } from './_resolution-context';
  * @internal
  */
 export class _Container implements DependencyInjectionContainer {
-  /** Dependency Injection Registry. */
   readonly #registry = new _Registry();
 
   /** @inheritdoc */
