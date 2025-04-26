@@ -97,6 +97,7 @@
   "jest.runMode": "on-demand",
   "prettier.enableDebugLogs": true,
   "prettier.endOfLine": "lf",
+  "sort-json.settings.excludePaths": ["tsImportSorter.configuration.groupRules"],
   "sort-json.settings.sortMode": "Objects Only",
   "terminal.integrated.cursorStyle": "line",
   "terminal.integrated.suggest.enabled": true,
@@ -143,6 +144,7 @@
         }
       ]
     },
+    // # Modules
     {
       "subGroups": [
         // # Dependencies

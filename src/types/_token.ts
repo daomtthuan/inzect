@@ -3,19 +3,19 @@ import type { AbstractClass, Class, Primitive } from 'type-fest';
 /** Injection Token Primitive. */
 export type InjectionTokenPrimitive = {
   /** Token. */
-  token: Primitive;
+  token: Exclude<Primitive, null | undefined>;
 };
 
 /**
  * Injection Token Class.
  *
- * @template TInstance Type of instance.
+ * @template TType Type of instance.
  */
-export type InjectionTokenClass<TInstance> = Class<TInstance> | AbstractClass<TInstance>;
+export type InjectionTokenClass<TType> = Class<TType> | AbstractClass<TType>;
 
 /**
  * Dependency Injection Token.
  *
- * @template TInstance Type of instance.
+ * @template TType Type of instance.
  */
-export type InjectionToken<TInstance> = InjectionTokenPrimitive | InjectionTokenClass<TInstance>;
+export type InjectionToken<TType> = InjectionTokenPrimitive | InjectionTokenClass<TType>;

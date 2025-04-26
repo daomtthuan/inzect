@@ -1,47 +1,6 @@
 import type { InjectionLifecycle } from './_lifecycle';
-import type { ClassInjectionProvider, FactoryInjectionProvider, ValueInjectionProvider } from './_provider';
+import type { InjectionProvider } from './_provider';
 import type { InjectionToken } from './_token';
-
-/**
- * Register Options Base.
- *
- * @template TType Type of instance.
- */
-export interface RegisterOptionsBase<TType> {
-  /** Injection Token. */
-  token: InjectionToken<TType>;
-
-  /** Injection Lifecycle Scope. */
-  scope?: InjectionLifecycle;
-}
-
-/**
- * Class Register Options.
- *
- * @template TType Type of instance.
- */
-export interface ClassRegisterOptions<TType> extends RegisterOptionsBase<TType>, ClassInjectionProvider<TType> {}
-
-/**
- * Value Register Options.
- *
- * @template TType Type of instance.
- */
-export interface ValueRegisterOptions<TType> extends RegisterOptionsBase<TType>, ValueInjectionProvider<TType> {}
-
-/**
- * Factory Injection Provider.
- *
- * @template TType Type of instance.
- */
-export interface FactoryRegisterOptions<TType> extends RegisterOptionsBase<TType>, FactoryInjectionProvider<TType> {}
-
-/**
- * Register Options.
- *
- * @template TType Type of instance.
- */
-export type RegisterOptions<TType> = ClassRegisterOptions<TType> | ValueRegisterOptions<TType> | FactoryRegisterOptions<TType>;
 
 /**
  * Registration.
@@ -49,8 +8,11 @@ export type RegisterOptions<TType> = ClassRegisterOptions<TType> | ValueRegister
  * @template TType Type of instance.
  */
 export interface Registration<TType> {
-  /** Register Options. */
-  options: RegisterOptions<TType>;
+  /** Injection Provider. */
+  provider: InjectionProvider<TType>;
+
+  /** Injection Lifecycle Scope. */
+  scope: InjectionLifecycle;
 
   /** Resolved Instance. */
   instance?: TType;
