@@ -1,15 +1,15 @@
-import type { InjectionToken, ResolutionErrorOptions } from '~/types';
+import type { InjectionToken, RegistrationErrorOptions } from '~/types';
 
 /**
- * Dependency Resolution Error.
+ * Dependency Registration Error.
  *
  * @template TType Type of instance.
  */
-export class ResolutionError<Type = any> extends Error {
+export class RegistrationError<Type = any> extends Error {
   readonly #token: InjectionToken<Type>;
 
-  /** @param options Resolution Error Options. */
-  public constructor(options: ResolutionErrorOptions<Type>) {
+  /** @param options Registration Error Options. */
+  public constructor(options: RegistrationErrorOptions<Type>) {
     super(options.message, {
       cause: options.cause,
     });

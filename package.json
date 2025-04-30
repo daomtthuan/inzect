@@ -9,7 +9,8 @@
   "type": "module",
   "scripts": {
     "build": "tsx ./script/index.ts build",
-    "pack": "tsx ./script/index.ts pack"
+    "pack": "tsx ./script/index.ts pack",
+    "test": "tsx ./test/index.ts"
   },
   "dependencies": {
     "type-fest": "^4.40.1"

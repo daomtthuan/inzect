@@ -2,8 +2,8 @@ import type { AbstractClass, Class, Primitive } from 'type-fest';
 
 /** Injection Token Primitive. */
 export type InjectionTokenPrimitive = {
-  /** Token. */
-  token: Exclude<Primitive, null | undefined>;
+  /** Token value. */
+  value: Exclude<Primitive, null | undefined>;
 };
 
 /**

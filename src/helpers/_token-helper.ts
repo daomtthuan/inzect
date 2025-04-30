@@ -1,9 +1,13 @@
 import type { InjectionToken, InjectionTokenClass, InjectionTokenPrimitive } from '~/types';
 
-/** Helper for Injection Token. */
-export class InjectionTokenHelper {
-  static readonly #acceptedPrimitiveTokenTypes = ['string', 'number', 'boolean', 'symbol', 'bigint'];
+import { _TypeHelper } from './_type-helper';
 
+/**
+ * Helper for Injection Token.
+ *
+ * @internal
+ */
+export class _InjectionTokenHelper {
   /**
    * Check if the token is {@link InjectionTokenPrimitive}.
    *
@@ -13,7 +17,7 @@ export class InjectionTokenHelper {
    * @returns True if the token is {@link InjectionTokenPrimitive}, false otherwise.
    */
   public static isPrimitiveInjectionToken<TType>(token: InjectionToken<TType>): token is InjectionTokenPrimitive {
-    return typeof token === 'object' && 'token' in token && InjectionTokenHelper.#acceptedPrimitiveTokenTypes.includes(typeof token.token);
+    return typeof token === 'object' && 'value' in token && !_TypeHelper.isNullish(token.value) && _TypeHelper.isPrimitive(token.value);
   }
 
   /**
@@ -25,6 +29,6 @@ export class InjectionTokenHelper {
    * @returns True if the token is {@link InjectionTokenClass}, false otherwise.
    */
   public static isClassInjectionToken<TType>(token: InjectionToken<TType>): token is InjectionTokenClass<TType> {
-    return typeof token === 'function' && token.toString().startsWith('class ');
+    return _TypeHelper.isClass(token);
   }
 }

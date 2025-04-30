@@ -20,11 +20,4 @@ export enum InjectionLifecycle {
    * Resolves the same instance only within the same resolution context.
    */
   Resolution,
-
-  /**
-   * Container scope.
-   *
-   * Resolves the same instance within the container.
-   */
-  Container,
 }

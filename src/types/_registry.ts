@@ -6,10 +6,11 @@ import type { InjectionToken } from './_token';
  * Registration.
  *
  * @template TType Type of instance.
+ * @template TProvider Injection Provider.
  */
-export interface Registration<TType> {
+export interface Registration<TType, TProvider extends InjectionProvider<TType> = InjectionProvider<TType>> {
   /** Injection Provider. */
-  provider: InjectionProvider<TType>;
+  provider: TProvider;
 
   /** Injection Lifecycle Scope. */
   scope: InjectionLifecycle;

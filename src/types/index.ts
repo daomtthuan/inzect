@@ -1,5 +1,15 @@
-export type { DefaultResolveOptions, DependencyInjectionContainer, OptionalResolveOptions, RegisterOptions, ResolveOptions } from './_container';
-export type { ResolutionErrorOptions } from './_error';
+export type {
+  ClassRegisterOptions,
+  DefaultResolveOptions,
+  DependencyInjectionContainer,
+  FactoryRegisterOptions,
+  OptionalResolveOptions,
+  RegisterOptions,
+  RegisterOptionsBase,
+  ResolveOptions,
+  ValueRegisterOptions,
+} from './_container';
+export type { ArgumentErrorOptions, RegistrationErrorOptions, ResolutionErrorOptions } from './_error';
 export type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
 export type { DependencyInjectionRegistry, Registration } from './_registry';
 export type { ResolutionContext } from './_resolution';

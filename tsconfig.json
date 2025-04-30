@@ -28,7 +28,8 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "tinydi": ["./src/index.ts"]
     },
 
     // Emit
@@ -86,5 +87,5 @@
     // Completeness
     "skipLibCheck": true
   },
-  "include": ["./src"]
+  "include": ["./src", "./test"]
 }

@@ -49,11 +49,11 @@ export abstract class ScriptBase {
     return JSON.parse(FS.readFileSync(packageJsonPath, 'utf-8'));
   }
 
-  #getBuildDirPath({ version }: PackageJson): string {
-    if (!version) {
+  #getBuildDirPath(packageJson: PackageJson): string {
+    if (!packageJson.version) {
       throw new Error(`Package version not found`);
     }
 
-    return Path.join(this.#rootPath, 'dist', version);
+    return Path.join(this.#rootPath, 'dist', packageJson.version);
   }
 }

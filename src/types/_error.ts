@@ -7,6 +7,16 @@ export interface ErrorOptionsBase extends ErrorOptions {
 }
 
 /**
+ * Registration Error Options.
+ *
+ * @template TType Type of instance.
+ */
+export interface RegistrationErrorOptions<TType> extends ErrorOptionsBase {
+  /** Injection token. */
+  token: InjectionToken<TType>;
+}
+
+/**
  * Resolution Error Options.
  *
  * @template TType Type of instance.
@@ -14,4 +24,10 @@ export interface ErrorOptionsBase extends ErrorOptions {
 export interface ResolutionErrorOptions<TType> extends ErrorOptionsBase {
   /** Injection token. */
   token: InjectionToken<TType>;
+}
+
+/** Argument Error Options. */
+export interface ArgumentErrorOptions extends ErrorOptionsBase {
+  /** Argument name. */
+  argument: string;
 }
