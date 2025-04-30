@@ -15,8 +15,7 @@
   "scripts": {
     "build": "tsx ./script/index.ts build",
     "pack": "tsx ./script/index.ts pack",
-    "publish": "tsx ./script/index.ts publish",
-    "test": "tsx ./test/index.ts"
+    "publish": "tsx ./script/index.ts publish"
   },
   "dependencies": {
     "polyfill-symbol-metadata": "^0.0.2",

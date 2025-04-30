@@ -5,7 +5,7 @@
       "name": "Test",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm tsx ./test/index.ts",
+      "command": "pnpm tsx ./playground/index.ts",
       "cwd": "${workspaceFolder}"
     }
   ]
