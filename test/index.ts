@@ -1,4 +1,4 @@
-import container, { Inject, Injectable, InjectionLifecycle } from 'tsinject';
+import container, { Inject, Injectable, InjectionLifecycle } from 'inzect';
 
 @Injectable({ scope: InjectionLifecycle.Singleton })
 class Greeter {
