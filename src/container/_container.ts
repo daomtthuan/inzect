@@ -2,7 +2,6 @@ import type {
   _ClassType,
   ClassInjectionProvider,
   ClassRegisterOptions,
-  DefaultResolveOptions,
   FactoryInjectionProvider,
   FactoryRegisterOptions,
   IDependencyInjectionContainer,
@@ -11,6 +10,7 @@ import type {
   OptionalResolveOptions,
   RegisterOptions,
   Registration,
+  RequiredResolveOptions,
   ResolveOptions,
   ValueInjectionProvider,
   ValueRegisterOptions,
@@ -49,7 +49,7 @@ export class _Container implements IDependencyInjectionContainer {
   }
 
   /** @inheritdoc */
-  public resolve<TType>(options: DefaultResolveOptions<TType>): TType;
+  public resolve<TType>(options: RequiredResolveOptions<TType>): TType;
   /** @inheritdoc */
   public resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
   /** @inheritdoc */

@@ -4,7 +4,7 @@ export type {
   IDependencyInjectionContainer,
   OptionalResolveOptions,
   RegisterOptions,
-  RequiredResolveOptions as DefaultResolveOptions,
+  RequiredResolveOptions,
   ResolveOptions,
   ValueRegisterOptions,
 } from './_container';

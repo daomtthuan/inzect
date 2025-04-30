@@ -35,7 +35,7 @@ export function Inject<TType>(options: OptionalInjectOptions<TType>): _ClassFiel
  * @returns Inject decorator.
  */
 export function Inject<TType>(options: InjectOptions<TType>): _ClassFieldDecorator<TType, TType | undefined> {
-  return (_, _context) => () => {
+  return () => () => {
     return !options.optional ?
         container.resolve({
           token: options.token,

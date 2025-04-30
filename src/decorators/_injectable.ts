@@ -12,7 +12,7 @@ import { container } from '~/container';
  * @returns Injectable decorator.
  */
 export function Injectable<TTarget extends _ClassType, TType>(options?: InjectableOptions<TType>): _ClassDecorator<TTarget> {
-  return (target, _context) => {
+  return (target) => {
     container.register({
       token: options?.token ?? target,
       provider: { useClass: target },
