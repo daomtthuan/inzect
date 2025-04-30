@@ -6,16 +6,22 @@ import Process from 'process';
 
 /** Script base. */
 export abstract class ScriptBase {
-  readonly #rootPath = Process.cwd();
-  readonly #packageJsonPath = Path.join(this.#rootPath, 'package.json');
+  readonly #rootDir = Process.cwd();
+  readonly #distDir = Path.join(this.#rootDir, 'dist');
+  readonly #packageJsonPath = Path.join(this.#rootDir, 'package.json');
   #packageJson?: PackageJson;
   #buildDirPath?: string;
 
   public abstract run(): void | Promise<void>;
 
-  /** @returns Root path. */
-  protected get rootPath(): string {
-    return this.#rootPath;
+  /** @returns Root directory path. */
+  protected get rootDir(): string {
+    return this.#rootDir;
+  }
+
+  /** @returns Dist directory path. */
+  protected get distDir(): string {
+    return this.#distDir;
   }
 
   /** @returns Package.json path. */
@@ -54,6 +60,6 @@ export abstract class ScriptBase {
       throw new Error(`Package version not found`);
     }
 
-    return Path.join(this.#rootPath, 'dist', packageJson.version);
+    return Path.join(this.#distDir, packageJson.version);
   }
 }

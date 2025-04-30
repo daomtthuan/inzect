@@ -9,11 +9,11 @@ export class PackScript extends ScriptBase {
   /** Run script. */
   public run(): void {
     this.#buildScript.run();
-    this.#pack();
+    this.#publish();
   }
 
-  #pack(): void {
-    ChildProcess.execSync(`pnpm pack --pack-destination "${this.distDir}"`, {
+  #publish(): void {
+    ChildProcess.execSync(`pnpm publish`, {
       cwd: this.buildDirPath,
       stdio: 'inherit',
     });

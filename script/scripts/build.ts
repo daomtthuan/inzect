@@ -48,14 +48,14 @@ export class BuildScript extends ScriptBase {
 
   #build(): void {
     ChildProcess.execSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.buildDirPath}" --strip-leading-paths`, {
-      cwd: this.rootPath,
+      cwd: this.rootDir,
       stdio: 'inherit',
     });
   }
 
   #copyFiles(): void {
     ['README.md', 'LICENSE'].forEach((fileName) => {
-      const sourcePath = Path.join(this.rootPath, fileName);
+      const sourcePath = Path.join(this.rootDir, fileName);
       const targetPath = Path.join(this.buildDirPath, fileName);
 
       FS.cpSync(sourcePath, targetPath);
