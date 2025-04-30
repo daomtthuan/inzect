@@ -41,7 +41,7 @@
   "codemetrics.basics.ComplexityTemplate": "Complexity: {0}",
   "codemetrics.basics.DecorationModeEnabled": false,
   "cSpell.caseSensitive": true,
-  "cSpell.words": ["tinydi", "ThuanDMT", "Daomtthuan"],
+  "cSpell.words": ["tsinject", "ThuanDMT", "Daomtthuan"],
   "dotenv.cloakColor": "#585b70",
   "dotenv.cloakIcon": "*",
   "dotenv.enableAutocloaking": false,
