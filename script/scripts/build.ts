@@ -30,8 +30,12 @@ export class BuildScript extends ScriptBase {
         {
           name: this.packageJson.name,
           version: this.packageJson.version,
+          license: this.packageJson.license,
+          description: this.packageJson.description,
           author: this.packageJson.author,
-          packageManager: this.packageJson.packageManager,
+          homepage: this.packageJson.homepage,
+          repository: this.packageJson.repository,
+          bugs: this.packageJson.bugs,
           type: this.packageJson.type,
           main: './index.js',
           exports: {
@@ -39,6 +43,7 @@ export class BuildScript extends ScriptBase {
             './*': './*/index.js',
           },
           dependencies: this.packageJson.dependencies,
+          keywords: this.packageJson.keywords,
         },
         null,
         2,
