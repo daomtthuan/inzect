@@ -1,4 +1,4 @@
-import { _container } from '~/container';
+import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
 import { type _ClassDecorator, type _ClassType, type InjectableOptions } from '~/types';
 
@@ -13,7 +13,7 @@ import { type _ClassDecorator, type _ClassType, type InjectableOptions } from '~
  */
 export function Injectable<TTarget extends _ClassType, TType>(options?: InjectableOptions<TType>): _ClassDecorator<TTarget> {
   return (target) => {
-    _container.register({
+    container.register({
       token: options?.token ?? target,
       provider: { useClass: target },
       scope: options?.scope,

@@ -29,5 +29,6 @@
     }
   },
   "sourceMaps": true,
-  "inlineSourcesContent": false
+  "inlineSourcesContent": false,
+  "minify": true
 }
