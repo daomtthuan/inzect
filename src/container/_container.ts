@@ -50,11 +50,14 @@ export class _Container implements IDependencyInjectionContainer {
   }
 
   /** @inheritdoc */
+  public resolve<TType>(token: InjectionToken<TType>): TType;
+  /** @inheritdoc */
   public resolve<TType>(options: RequiredResolveOptions<TType>): TType;
   /** @inheritdoc */
   public resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
   /** @inheritdoc */
-  public resolve<TType>(options: ResolveOptions<TType>): TType | undefined {
+  public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
+    const options = this.#resolveResolveOptions(tokenOrOptions);
     const token = options.token;
     this.#context = options.context ?? new _ResolutionContext();
     const optional = options.optional ?? false;
@@ -93,6 +96,16 @@ export class _Container implements IDependencyInjectionContainer {
   /** @returns Resolution context. */
   public get context(): IResolutionContext | undefined {
     return this.#context;
+  }
+
+  #resolveResolveOptions<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): ResolveOptions<TType> {
+    if (typeof tokenOrOptions === 'object' && 'token' in tokenOrOptions) {
+      return tokenOrOptions;
+    }
+
+    return {
+      token: tokenOrOptions,
+    };
   }
 
   #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, context: IResolutionContext, optional: boolean): TType | undefined {

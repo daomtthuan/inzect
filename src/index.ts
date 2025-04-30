@@ -1,6 +1,11 @@
 import 'polyfill-symbol-metadata';
 
-export { container } from './container';
+import { container } from './container';
+
 export * from './types';
 export * from './decorators';
 export * from './errors';
+
+export { container };
+
+export default container;

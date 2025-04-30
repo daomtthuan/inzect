@@ -111,7 +111,6 @@ export interface IDependencyInjectionContainer {
    * @param options Class Register options.
    */
   register<TType>(options: ClassRegisterOptions<TType>): void;
-
   /**
    * Registers a dependency with {@link ValueInjectionProvider}
    *
@@ -120,7 +119,6 @@ export interface IDependencyInjectionContainer {
    * @param options Value Register options.
    */
   register<TType>(options: ValueRegisterOptions<TType>): void;
-
   /**
    * Registers a dependency with {@link FactoryInjectionProvider}
    *
@@ -135,12 +133,21 @@ export interface IDependencyInjectionContainer {
    *
    * @overload
    * @template TType Type of instance to resolve.
+   * @param token Injection Token.
+   *
+   * @returns Resolved instance.
+   */
+  resolve<TType>(token: InjectionToken<TType>): TType;
+  /**
+   * Resolves a dependency.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
    * @param options Resolve options.
    *
    * @returns Resolved instance.
    */
   resolve<TType>(options: RequiredResolveOptions<TType>): TType;
-
   /**
    * Optional Resolves a dependency.\
    * Returns `undefined` if the token is not registered.
