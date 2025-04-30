@@ -1,13 +1,13 @@
-import type { InjectionToken, ResolutionContext } from '~/types';
+import type { InjectionToken, IResolutionContext } from '~/types';
 
 import { _ResolutionMap } from './_resolution-map';
 
 /**
- * Internal Resolution Context.
+ * Resolution Context.
  *
  * @internal
  */
-export class _ResolutionContext implements ResolutionContext {
+export class _ResolutionContext implements IResolutionContext {
   #resolutionMap = new _ResolutionMap();
 
   /** @inheritdoc */

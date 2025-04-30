@@ -1,16 +1,16 @@
-import type { Class } from 'type-fest';
 import type {
+  _ClassType,
   ClassInjectionProvider,
   ClassRegisterOptions,
   DefaultResolveOptions,
-  DependencyInjectionContainer,
   FactoryInjectionProvider,
   FactoryRegisterOptions,
+  IDependencyInjectionContainer,
   InjectionToken,
+  IResolutionContext,
   OptionalResolveOptions,
   RegisterOptions,
   Registration,
-  ResolutionContext,
   ResolveOptions,
   ValueInjectionProvider,
   ValueRegisterOptions,
@@ -23,11 +23,11 @@ import { _Registry } from './_registry';
 import { _ResolutionContext } from './_resolution-context';
 
 /**
- * Internal Dependency Injection Container.
+ * Dependency Injection Container.
  *
  * @internal
  */
-export class _Container implements DependencyInjectionContainer {
+export class _Container implements IDependencyInjectionContainer {
   readonly #registry = new _Registry();
 
   /** @inheritdoc */
@@ -81,42 +81,41 @@ export class _Container implements DependencyInjectionContainer {
     }
 
     throw new ResolutionError({
-      message: `Invalid registration found for token: ${token.toString()}`,
       token,
+      message: `Invalid registration found for token: ${token.toString()}`,
       cause: {
         registration,
       },
     });
   }
 
-  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, context: ResolutionContext, optional: boolean): TType | undefined {
+  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, context: IResolutionContext, optional: boolean): TType | undefined {
     if (_InjectionTokenHelper.isPrimitiveInjectionToken(token)) {
       if (optional) {
         return undefined;
       }
 
       throw new ResolutionError({
-        message: `Attempted to resolve unregistered token: ${token.toString()}`,
         token,
+        message: `Attempted to resolve unregistered token: ${token.toString()}`,
       });
     }
 
     // No registration found with this token. But the token is a class, try to construct an instance.
     if (_InjectionTokenHelper.isClassInjectionToken(token)) {
-      const constructor = token as Class<TType>;
-      return this.#constructInstance(constructor, context);
+      return this.#constructInstance(token, token, context);
     }
 
     throw new ResolutionError({
-      message: `Attempted to resolve not accepted token`,
       token,
+      message: `Attempted to resolve not accepted token`,
     });
   }
 
   #resolveLifecycleRegistration<TType>(
     token: InjectionToken<TType>,
     registration: Registration<TType>,
-    context: ResolutionContext,
+    context: IResolutionContext,
   ): [isResolved: false] | [isResolved: true, instance: TType] {
     if (registration.scope === InjectionLifecycle.Singleton && registration.instance !== undefined) {
       return [true, registration.instance];
@@ -132,9 +131,9 @@ export class _Container implements DependencyInjectionContainer {
   #resolveClassRegistration<TType>(
     token: InjectionToken<TType>,
     registration: Registration<TType, ClassInjectionProvider<TType>>,
-    context: ResolutionContext,
+    context: IResolutionContext,
   ): TType {
-    registration.instance = this.#constructInstance(registration.provider.useClass, context);
+    registration.instance = this.#constructInstance(token, registration.provider.useClass, context);
     if (registration.scope === InjectionLifecycle.Resolution) {
       context.setInstance(token, registration.instance);
     }
@@ -145,7 +144,7 @@ export class _Container implements DependencyInjectionContainer {
   #resolveValueRegistration<TType>(
     _token: InjectionToken<TType>,
     _registration: Registration<TType, ValueInjectionProvider<TType>>,
-    _context: ResolutionContext,
+    _context: IResolutionContext,
   ): TType {
     throw new Error('Not implemented');
   }
@@ -153,12 +152,19 @@ export class _Container implements DependencyInjectionContainer {
   #resolveFactoryRegistration<TType>(
     _token: InjectionToken<TType>,
     _registration: Registration<TType, FactoryInjectionProvider<TType>>,
-    _context: ResolutionContext,
+    _context: IResolutionContext,
   ): TType {
     throw new Error('Not implemented');
   }
 
-  #constructInstance<TType>(constructor: Class<TType>, _context: ResolutionContext): TType {
-    return new constructor();
+  #constructInstance<TType>(token: InjectionToken<TType>, constructor: _ClassType<TType>, _context: IResolutionContext): TType {
+    if (_TypeHelper.isClass(constructor)) {
+      return new constructor();
+    }
+
+    throw new ResolutionError({
+      token,
+      message: `Attempted to construct not a class`,
+    });
   }
 }

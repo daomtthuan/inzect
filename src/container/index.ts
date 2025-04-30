@@ -1,6 +1,6 @@
-import type { DependencyInjectionContainer } from '~/types';
+import type { IDependencyInjectionContainer } from '~/types';
 
 import { _Container } from './_container';
 
 /** Dependency Injection Container. */
-export const container: DependencyInjectionContainer = new _Container();
+export const container: IDependencyInjectionContainer = new _Container();

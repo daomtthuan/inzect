@@ -1,6 +1,6 @@
 import type { InjectionLifecycle } from './_lifecycle';
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
-import type { ResolutionContext } from './_resolution';
+import type { IResolutionContext } from './_resolution';
 import type { InjectionToken } from './_token';
 
 /**
@@ -8,8 +8,9 @@ import type { InjectionToken } from './_token';
  *
  * @template TType Type of instance.
  * @template TProvider Injection Provider.
+ * @internal
  */
-export interface RegisterOptionsBase<TType, TProvider extends InjectionProvider<TType> = InjectionProvider<TType>> {
+type _RegisterOptionsBase<TType, TProvider extends InjectionProvider<TType> = InjectionProvider<TType>> = {
   /** Injection Token. */
   token: InjectionToken<TType>;
 
@@ -21,29 +22,29 @@ export interface RegisterOptionsBase<TType, TProvider extends InjectionProvider<
    *
    * @default InjectionLifecycle.Singleton
    */
-  scope?: InjectionLifecycle;
-}
+  scope?: InjectionLifecycle | undefined;
+};
 
 /**
  * Class Register Options.
  *
  * @template TType Type of instance.
  */
-export interface ClassRegisterOptions<TType> extends RegisterOptionsBase<TType, ClassInjectionProvider<TType>> {}
+export type ClassRegisterOptions<TType> = _RegisterOptionsBase<TType, ClassInjectionProvider<TType>>;
 
 /**
  * Value Register Options.
  *
  * @template TType Type of instance.
  */
-export interface ValueRegisterOptions<TType> extends RegisterOptionsBase<TType, ValueInjectionProvider<TType>> {}
+export type ValueRegisterOptions<TType> = _RegisterOptionsBase<TType, ValueInjectionProvider<TType>>;
 
 /**
  * Factory Register Options.
  *
  * @template TType Type of instance.
  */
-export interface FactoryRegisterOptions<TType> extends RegisterOptionsBase<TType, FactoryInjectionProvider<TType>> {}
+export type FactoryRegisterOptions<TType> = _RegisterOptionsBase<TType, FactoryInjectionProvider<TType>>;
 
 /**
  * Register Options.
@@ -56,8 +57,9 @@ export type RegisterOptions<TType> = ClassRegisterOptions<TType> | ValueRegister
  * Resolve Options Base.
  *
  * @template TType Type of instance.
+ * @internal
  */
-interface ResolveOptionsBase<TType> {
+type _ResolveOptionsBase<TType> = {
   /** Injection Token. */
   token: InjectionToken<TType>;
 
@@ -65,32 +67,32 @@ interface ResolveOptionsBase<TType> {
    * Resolution context.\
    * If not provided, the internal resolution context will be used.
    */
-  context?: ResolutionContext;
-}
+  context?: IResolutionContext;
+};
 
 /**
  * Default Resolve Options.
  *
  * @template TType Type of instance.
  */
-export interface DefaultResolveOptions<TType> extends ResolveOptionsBase<TType> {
+export type DefaultResolveOptions<TType> = _ResolveOptionsBase<TType> & {
   /**
    * `true` if the resolution is optional, `false` otherwise.
    *
    * @default false
    */
-  optional?: false;
-}
+  optional?: false | undefined;
+};
 
 /**
  * Optional Resolve Options.
  *
  * @template TType Type of instance.
  */
-export interface OptionalResolveOptions<TType> extends ResolveOptionsBase<TType> {
+export type OptionalResolveOptions<TType> = _ResolveOptionsBase<TType> & {
   /** `true` if the resolution is optional, `false` otherwise. */
   optional: true;
-}
+};
 
 /**
  * Resolve Options.
@@ -99,8 +101,8 @@ export interface OptionalResolveOptions<TType> extends ResolveOptionsBase<TType>
  */
 export type ResolveOptions<TType> = DefaultResolveOptions<TType> | OptionalResolveOptions<TType>;
 
-/** Dependency Injection Container. */
-export interface DependencyInjectionContainer {
+/** Dependency Injection Container Interface. */
+export interface IDependencyInjectionContainer {
   /**
    * Registers a dependency with {@link ClassInjectionProvider}
    *

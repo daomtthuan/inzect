@@ -1,26 +1,8 @@
-import type { InjectionLifecycle } from './_lifecycle';
-import type { InjectionProvider } from './_provider';
+import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
-/**
- * Registration.
- *
- * @template TType Type of instance.
- * @template TProvider Injection Provider.
- */
-export interface Registration<TType, TProvider extends InjectionProvider<TType> = InjectionProvider<TType>> {
-  /** Injection Provider. */
-  provider: TProvider;
-
-  /** Injection Lifecycle Scope. */
-  scope: InjectionLifecycle;
-
-  /** Resolved Instance. */
-  instance?: TType;
-}
-
-/** Dependency Injection Registry. */
-export interface DependencyInjectionRegistry {
+/** Dependency Injection Registry Interface. */
+export interface IDependencyInjectionRegistry {
   /**
    * Set registration.
    *

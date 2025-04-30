@@ -1,32 +1,32 @@
-import type { Class } from 'type-fest';
-import type { DependencyInjectionContainer } from './_container';
+import type { IDependencyInjectionContainer } from './_container';
+import type { _ClassType } from './_type';
 
 /**
  * Class Injection Provider.
  *
  * @template TType Type of instance.
  */
-export interface ClassInjectionProvider<TType> {
+export type ClassInjectionProvider<TType> = {
   /** Provides a class. */
-  useClass: Class<TType>;
-}
+  useClass: _ClassType<TType>;
+};
 
 /**
  * Value Injection Provider.
  *
  * @template TType Type of instance.
  */
-export interface ValueInjectionProvider<TType> {
+export type ValueInjectionProvider<TType> = {
   /** Provides a value. */
   useValue: TType;
-}
+};
 
 /**
  * Factory Injection Provider.
  *
  * @template TType Type of instance.
  */
-export interface FactoryInjectionProvider<TType> {
+export type FactoryInjectionProvider<TType> = {
   /**
    * Provides a factory.
    *
@@ -34,8 +34,8 @@ export interface FactoryInjectionProvider<TType> {
    *
    * @returns Instance to provide.
    */
-  useFactory: (container: DependencyInjectionContainer) => TType;
-}
+  useFactory: (container: IDependencyInjectionContainer) => TType;
+};
 
 /**
  * Injection Provider.

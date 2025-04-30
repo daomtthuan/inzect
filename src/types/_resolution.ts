@@ -1,10 +1,11 @@
 import type { InjectionToken } from './_token';
 
-/** Resolution Context. */
-export interface ResolutionContext {
+/** Resolution Context Interface. */
+export interface IResolutionContext {
   /**
    * Get instance.
    *
+   * @template TType Type of instance.
    * @param token Injection token.
    */
   getInstance<TType>(token: InjectionToken<TType>): TType;
@@ -12,6 +13,7 @@ export interface ResolutionContext {
   /**
    * Set instance.
    *
+   * @template TType Type of instance.
    * @param token Injection token.
    * @param instance Instance.
    */
@@ -20,11 +22,12 @@ export interface ResolutionContext {
   /**
    * Check if the context has an instance for the token.
    *
+   * @template TType Type of instance.
    * @param token Injection token.
    *
    * @returns True if the context has an instance for the token, false otherwise.
    */
-  hasInstance(token: InjectionToken<unknown>): boolean;
+  hasInstance<TType>(token: InjectionToken<TType>): boolean;
 
   /** Clear the context. */
   clearInstances(): void;

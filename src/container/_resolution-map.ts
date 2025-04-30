@@ -1,7 +1,7 @@
 import type { InjectionToken } from '~/types';
 
 /**
- * Internal Resolution Map.
+ * Resolution Map.
  *
  * @template TType Type of instance.
  * @internal

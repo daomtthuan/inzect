@@ -1,33 +1,37 @@
 import type { InjectionToken } from './_token';
 
-/** Error Options Base. */
-export interface ErrorOptionsBase extends ErrorOptions {
+/**
+ * Error Options Base.
+ *
+ * @internal
+ */
+type _ErrorOptionsBase = ErrorOptions & {
   /** Error message. */
   message: string;
-}
+};
 
 /**
  * Registration Error Options.
  *
  * @template TType Type of instance.
  */
-export interface RegistrationErrorOptions<TType> extends ErrorOptionsBase {
+export type RegistrationErrorOptions<TType> = _ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
-}
+};
 
 /**
  * Resolution Error Options.
  *
  * @template TType Type of instance.
  */
-export interface ResolutionErrorOptions<TType> extends ErrorOptionsBase {
+export type ResolutionErrorOptions<TType> = _ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
-}
+};
 
 /** Argument Error Options. */
-export interface ArgumentErrorOptions extends ErrorOptionsBase {
+export type ArgumentErrorOptions = _ErrorOptionsBase & {
   /** Argument name. */
   argument: string;
-}
+};

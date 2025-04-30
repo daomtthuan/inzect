@@ -1,7 +1,7 @@
 import type { InjectionToken, Registration } from '~/types';
 
 /**
- * Internal Registration Map.
+ * Registration Map.
  *
  * @template TType Type of instance.
  * @internal

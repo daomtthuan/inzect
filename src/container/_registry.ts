@@ -1,13 +1,13 @@
-import type { DependencyInjectionRegistry, InjectionToken, Registration } from '~/types';
+import type { IDependencyInjectionRegistry, InjectionToken, Registration } from '~/types';
 
 import { _RegistrationMap } from './_registration-map';
 
 /**
- * Internal Dependency Injection Registry.
+ * Dependency Injection Registry.
  *
  * @internal
  */
-export class _Registry implements DependencyInjectionRegistry {
+export class _Registry implements IDependencyInjectionRegistry {
   #registrationMap = new _RegistrationMap();
 
   /** @inheritdoc */

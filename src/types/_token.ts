@@ -1,4 +1,5 @@
-import type { AbstractClass, Class, Primitive } from 'type-fest';
+import type { Primitive } from 'type-fest';
+import type { _ClassType } from './_type';
 
 /** Injection Token Primitive. */
 export type InjectionTokenPrimitive = {
@@ -11,7 +12,7 @@ export type InjectionTokenPrimitive = {
  *
  * @template TType Type of instance.
  */
-export type InjectionTokenClass<TType> = Class<TType> | AbstractClass<TType>;
+export type InjectionTokenClass<TType> = _ClassType<TType>;
 
 /**
  * Dependency Injection Token.
