@@ -19,6 +19,7 @@
     "test": "tsx ./test/index.ts"
   },
   "dependencies": {
+    "polyfill-symbol-metadata": "^0.0.2",
     "type-fest": "^4.40.1"
   },
   "devDependencies": {

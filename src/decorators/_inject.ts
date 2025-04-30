@@ -1,6 +1,6 @@
 import type { _ClassDecorator, _ClassFieldDecorator, InjectOptions, OptionalInjectOptions, RequiredInjectOptions } from '~/types';
 
-import { container } from '~/container';
+import { _container, _ResolutionContext } from '~/container';
 
 /**
  * Decorator factory to mark a class field will be injected.
@@ -37,12 +37,14 @@ export function Inject<TType>(options: OptionalInjectOptions<TType>): _ClassFiel
 export function Inject<TType>(options: InjectOptions<TType>): _ClassFieldDecorator<TType, TType | undefined> {
   return () => () => {
     return !options.optional ?
-        container.resolve({
+        _container.resolve({
           token: options.token,
+          context: _container.context,
         })
-      : container.resolve({
+      : _container.resolve({
           token: options.token,
           optional: true,
+          context: _container.context,
         });
   };
 }

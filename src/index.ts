@@ -1,9 +1,14 @@
-import { container } from './container';
+import 'polyfill-symbol-metadata';
+
+import type { IDependencyInjectionContainer } from './types';
+
+import { _container } from './container';
 
 export * from './types';
-export * from './container';
 export * from './decorators';
 export * from './errors';
-export * from './helpers';
+
+/** Dependency Injection Container. */
+export const container: IDependencyInjectionContainer = _container;
 
 export default container;

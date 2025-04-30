@@ -67,7 +67,7 @@ type _ResolveOptionsBase<TType> = {
    * Resolution context.\
    * If not provided, the internal resolution context will be used.
    */
-  context?: IResolutionContext;
+  context?: IResolutionContext | undefined;
 };
 
 /**

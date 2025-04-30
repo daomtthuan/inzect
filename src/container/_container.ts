@@ -29,6 +29,7 @@ import { _ResolutionContext } from './_resolution-context';
  */
 export class _Container implements IDependencyInjectionContainer {
   readonly #registry = new _Registry();
+  #context?: IResolutionContext;
 
   /** @inheritdoc */
   public register<TType>(options: ClassRegisterOptions<TType>): void;
@@ -55,29 +56,29 @@ export class _Container implements IDependencyInjectionContainer {
   /** @inheritdoc */
   public resolve<TType>(options: ResolveOptions<TType>): TType | undefined {
     const token = options.token;
-    const context = options.context ?? new _ResolutionContext();
+    this.#context = options.context ?? new _ResolutionContext();
     const optional = options.optional ?? false;
 
     const registration = this.#registry.get(token);
     if (!registration) {
-      return this.#resolveUnregisteredRegistration(token, context, optional);
+      return this.#resolveUnregisteredRegistration(token, this.#context, optional);
     }
 
-    const [isResolved, instance] = this.#resolveLifecycleRegistration(token, registration, context);
+    const [isResolved, instance] = this.#resolveLifecycleRegistration(token, registration, this.#context);
     if (isResolved) {
       return instance;
     }
 
     if (_RegistrationHelper.isClassRegistration(registration)) {
-      return this.#resolveClassRegistration(token, registration, context);
+      return this.#resolveClassRegistration(token, registration, this.#context);
     }
 
     if (_RegistrationHelper.isValueRegistration(registration)) {
-      return this.#resolveValueRegistration(token, registration, context);
+      return this.#resolveValueRegistration(token, registration, this.#context);
     }
 
     if (_RegistrationHelper.isFactoryRegistration(registration)) {
-      return this.#resolveFactoryRegistration(token, registration, context);
+      return this.#resolveFactoryRegistration(token, registration, this.#context);
     }
 
     throw new ResolutionError({
@@ -87,6 +88,11 @@ export class _Container implements IDependencyInjectionContainer {
         registration,
       },
     });
+  }
+
+  /** @returns Resolution context. */
+  public get context(): IResolutionContext | undefined {
+    return this.#context;
   }
 
   #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, context: IResolutionContext, optional: boolean): TType | undefined {

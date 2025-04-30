@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      polyfill-symbol-metadata:
+        specifier: ^0.0.2
+        version: 0.0.2
       type-fest:
         specifier: ^4.40.1
         version: 4.40.1
@@ -1214,6 +1217,9 @@ packages:
 
   piscina@4.9.2:
     resolution: {integrity: sha512-Fq0FERJWFEUpB4eSY59wSNwXD4RYqR+nR/WiEVcZW8IWfVBxJJafcgTEZDQo8k3w0sUarJ8RyVbbUF4GQ2LGbQ==}
+
+  polyfill-symbol-metadata@0.0.2:
+    resolution: {integrity: sha512-0piO8cqxwS9UXCevXi93/2jrkBrdtGU+O1U76Pydqk0iOeSt8l3aO0dx44uwv3+KlKgJhmy/Q3ESrpfwpEX3bQ==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -2599,6 +2605,8 @@ snapshots:
   piscina@4.9.2:
     optionalDependencies:
       '@napi-rs/nice': 1.0.1
+
+  polyfill-symbol-metadata@0.0.2: {}
 
   prelude-ls@1.2.1: {}
 

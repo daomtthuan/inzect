@@ -40,7 +40,6 @@ export class BuildScript extends ScriptBase {
           main: './index.js',
           exports: {
             '.': './index.js',
-            './*': './*/index.js',
           },
           dependencies: this.packageJson.dependencies,
           keywords: this.packageJson.keywords,
