@@ -11,8 +11,6 @@
     "lib": ["esnext"],
     "useDefineForClassFields": true,
     "moduleDetection": "force",
-    "experimentalDecorators": false,
-    "emitDecoratorMetadata": false,
 
     // Module Resolution
     "module": "esnext",
@@ -25,7 +23,6 @@
     "resolveJsonModule": true,
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
-    "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],

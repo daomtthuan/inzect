@@ -3,8 +3,7 @@ import type { _ClassDecorator, _ClassType, InjectableOptions } from '~/types';
 import { container } from '~/container';
 
 /**
- * Decorator factory to mark a class as injectable.\
- * Allow dependencies to be injected at runtime.
+ * Decorator factory to mark a class as injectable.
  *
  * @template TTarget Target class.
  * @template TType Type of instance.

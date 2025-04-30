@@ -71,11 +71,11 @@ type _ResolveOptionsBase<TType> = {
 };
 
 /**
- * Default Resolve Options.
+ * Required Resolve Options.
  *
  * @template TType Type of instance.
  */
-export type DefaultResolveOptions<TType> = _ResolveOptionsBase<TType> & {
+export type RequiredResolveOptions<TType> = _ResolveOptionsBase<TType> & {
   /**
    * `true` if the resolution is optional, `false` otherwise.
    *
@@ -99,7 +99,7 @@ export type OptionalResolveOptions<TType> = _ResolveOptionsBase<TType> & {
  *
  * @template TType Type of instance.
  */
-export type ResolveOptions<TType> = DefaultResolveOptions<TType> | OptionalResolveOptions<TType>;
+export type ResolveOptions<TType> = RequiredResolveOptions<TType> | OptionalResolveOptions<TType>;
 
 /** Dependency Injection Container Interface. */
 export interface IDependencyInjectionContainer {
@@ -139,7 +139,7 @@ export interface IDependencyInjectionContainer {
    *
    * @returns Resolved instance.
    */
-  resolve<TType>(options: DefaultResolveOptions<TType>): TType;
+  resolve<TType>(options: RequiredResolveOptions<TType>): TType;
 
   /**
    * Optional Resolves a dependency.\

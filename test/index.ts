@@ -1,13 +1,22 @@
-import Container, { Injectable, InjectionLifecycle } from 'tinydi';
+import container, { Inject, Injectable, InjectionLifecycle } from 'tinydi';
 
 @Injectable({ scope: InjectionLifecycle.Singleton })
 class Greeter {
   public greet(): void {
-    console.log('hello');
+    console.log(`Hello`);
   }
 }
 
-const greeter1 = Container.resolve({ token: Greeter });
-const greeter2 = Container.resolve({ token: Greeter });
+class Person {
+  @Inject({ token: Greeter })
+  private readonly greeter!: Greeter;
 
-console.log(greeter1 === greeter2);
+  /** Say hello. */
+  public sayHello(): void {
+    this.greeter.greet();
+  }
+}
+
+const person = container.resolve({ token: Person });
+
+person.sayHello();
