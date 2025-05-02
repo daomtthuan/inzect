@@ -1,4 +1,4 @@
-import type { Class } from 'type-fest';
+import type { Class, Primitive } from 'type-fest';
 import type { _ClassType } from '~/types';
 
 /**
@@ -7,6 +7,30 @@ import type { _ClassType } from '~/types';
  * @internal
  */
 export class _TypeHelper {
+  static readonly #primitiveTypes = ['string', 'number', 'boolean', 'symbol', 'bigint'];
+
+  /**
+   * Check if the value is null or undefined.
+   *
+   * @param value Value.
+   *
+   * @returns `true` if the value is null or undefined, `false` otherwise.
+   */
+  public static isNullish(value: unknown): value is null | undefined {
+    return value === null || value === undefined;
+  }
+
+  /**
+   * Check if the value is primitive.
+   *
+   * @param value Value.
+   *
+   * @returns `true` if the value is primitive, `false` otherwise.
+   */
+  public static isPrimitive(value: unknown): value is Primitive {
+    return _TypeHelper.isNullish(value) || this.#primitiveTypes.includes(typeof value);
+  }
+
   /**
    * Check if the value is {@link Class}.
    *

@@ -84,7 +84,7 @@ export class _Container implements IDependencyInjectionContainer {
   public clear(): void {
     this.#registry.clear();
     this.#internalResolutionContext = undefined;
-    _InjectionTokenHelper.stringKeyMap.clear();
+    _InjectionTokenHelper.primitiveKeyMap.clear();
   }
 
   /**
@@ -129,7 +129,7 @@ export class _Container implements IDependencyInjectionContainer {
   }
 
   #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean, context: IResolutionContext): TType | undefined {
-    if (_InjectionTokenHelper.isStringInjectionToken(token)) {
+    if (_InjectionTokenHelper.isPrimitiveInjectionToken(token)) {
       if (optional) {
         return undefined;
       }

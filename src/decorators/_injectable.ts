@@ -57,7 +57,7 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
  * @returns Resolved Injectable options.
  */
 function resolveInjectableOptions<TType>(tokenOrOptions: InjectionToken<TType> | InjectableOptions<TType>): InjectableOptions<TType> {
-  if (_InjectionTokenHelper.isStringInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {
+  if (_InjectionTokenHelper.isPrimitiveInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {
     return {
       token: tokenOrOptions,
       scope: InjectionLifecycle.Transient,
