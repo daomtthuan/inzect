@@ -12,6 +12,7 @@ export abstract class ScriptBase {
   #packageJson?: PackageJson;
   #buildDirPath?: string;
 
+  /** Run script. */
   public abstract run(): void | Promise<void>;
 
   /** @returns Root directory path. */

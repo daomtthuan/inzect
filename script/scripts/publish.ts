@@ -1,12 +1,16 @@
 import ChildProcess from 'child_process';
+import { Inject, Scope } from '~/decorators';
+import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
 import { BuildScript } from './build';
 
 /** Pack script. */
+@Scope(Lifecycle.Singleton)
 export class PackScript extends ScriptBase {
-  readonly #buildScript = new BuildScript();
+  @Inject(BuildScript)
+  readonly #buildScript!: BuildScript;
 
-  /** Run script. */
+  /** @inheritdoc */
   public run(): void {
     this.#buildScript.run();
     this.#publish();

@@ -1,15 +1,25 @@
 import ChildProcess from 'child_process';
 import FS from 'fs';
 import Path from 'path';
+import { Inject, Scope } from '~/decorators';
+import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
+import ReadmeScript from './readme';
 
 /** Build script. */
+@Scope(Lifecycle.Singleton)
 export class BuildScript extends ScriptBase {
-  /** Run script. */
+  @Inject(ReadmeScript)
+  readonly #readmeScript!: ReadmeScript;
+
+  /** @inheritdoc */
   public run(): void {
     this.#cleanBuildDir();
+
     this.#build();
     this.#createBuildPackageJson();
+    this.#readmeScript.run();
+
     this.#copyFiles();
   }
 

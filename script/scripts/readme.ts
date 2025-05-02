@@ -1,14 +1,17 @@
 import FS from 'fs';
 import Path from 'path';
+import { Scope } from '~/decorators';
+import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
 
 /** Readme script. */
+@Scope(Lifecycle.Singleton)
 export class ReadmeScript extends ScriptBase {
   readonly #templatePath = Path.join(this.rootDir, './script/templates/readme-template.md');
   readonly #readmePath = Path.join(this.rootDir, './README.md');
   readonly #examplePlaceholderRegex = /([ ]*?)__\[EXAMPLE\]\((.+?)\)__/g;
 
-  /** Run script. */
+  /** @inheritdoc */
   public run(): void {
     this.#build();
   }
