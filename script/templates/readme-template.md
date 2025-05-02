@@ -87,24 +87,13 @@ Use this decorator to register a class as a provider that can be injected into o
 ```ts
 // logger-service.ts
 
-import { Injectable } from 'inzect';
-
-@Injectable()
-export class Logger {
-  public log(message: string): void {
-    console.log(`[LOG]: ${message}`);
-  }
-}
+__[EXAMPLE](/examples/modules/logger.ts)__
 ```
 
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-const logger = container.resolve(Logger);
-logger.log('Hello world!');
+__[EXAMPLE](/examples/decorators/injectable/index.ts)__
 ```
 
 #### `@Inject()`
@@ -124,17 +113,7 @@ Use this decorator to inject into class fields or class properties. Or use this 
    ```ts
    // app.ts
 
-   import { Inject } from 'inzect';
-   import { Logger } from '~examples/modules/logger';
-
-   export class App {
-     @Inject(Logger)
-     readonly #logger!: Logger;
-
-     run(): void {
-       this.#logger.log('Hello world!');
-     }
-   }
+   __[EXAMPLE](/examples/decorators/inject/class-field.ts)__
    ```
 
 2. Inject into constructor parameters.
@@ -142,21 +121,7 @@ Use this decorator to inject into class fields or class properties. Or use this 
    ```ts
    // app.ts
 
-   import { Inject } from 'inzect';
-   import { Logger } from '~examples/modules/logger';
-
-   @Inject([Logger])
-   export class App {
-     readonly #logger: Logger;
-
-     public constructor(logger: Logger) {
-       this.#logger = logger;
-     }
-
-     run(): void {
-       this.#logger.log('Hello world!');
-     }
-   }
+   __[EXAMPLE](/examples/decorators/inject/class-param.ts)__
    ```
 
 #### `@Scope()`
@@ -173,14 +138,7 @@ Use this decorator to control how and when instances are created.
 ```ts
 // database.ts
 
-import { Lifecycle, Scope } from 'inzect';
-
-@Scope(Lifecycle.Singleton)
-export class Database {
-  public async connect(): Promise<void> {
-    console.log('Database connected');
-  }
-}
+__[EXAMPLE](/examples/modules/database.ts)__
 ```
 
 ### Container
@@ -218,15 +176,7 @@ A **class injection provider** is used to provide an instance of a class.
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-container.register({
-  token: 'logger',
-  provider: {
-    useClass: Logger,
-  },
-});
+__[EXAMPLE](/examples/container/provider/class.ts)__
 ```
 
 ##### Value Injection Provider
@@ -242,14 +192,7 @@ A **value injection provider** is used to provide a value.
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-
-container.register({
-  token: 'isProduction',
-  provider: {
-    useValue: process.env['NODE_ENV'] === 'production',
-  },
-});
+__[EXAMPLE](/examples/container/provider/value.ts)__
 ```
 
 ##### Factory Injection Provider
@@ -265,29 +208,7 @@ A **factory injection provider** is used to provide an instance using a factory 
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-container.register({
-  token: 'database-connection',
-  provider: {
-    inject: [
-      Logger,
-      {
-        token: 'isProduction',
-        optional: true,
-      },
-    ],
-    useFactory: (logger: Logger, isProduction?: boolean) => {
-      if (isProduction) {
-        return 'production-connection';
-      }
-
-      logger.log('Using development connection');
-      return 'development-connection';
-    },
-  },
-});
+__[EXAMPLE](/examples/container/provider/factory.ts)__
 ```
 
 #### Lifecycle Scope
@@ -304,15 +225,7 @@ Supported scopes are:
 ```ts
 // index.ts
 
-import { container, Lifecycle, Scope } from 'inzect';
-
-@Scope(Lifecycle.Singleton)
-class Service {}
-
-const service1 = container.resolve(Service);
-const service2 = container.resolve(Service);
-
-console.log(service1 === service2); // true
+__[EXAMPLE](/examples/container/scope/singleton.ts)__
 ```
 
 ##### Transient Scope
@@ -320,15 +233,7 @@ console.log(service1 === service2); // true
 ```ts
 // index.ts
 
-import { container, Lifecycle, Scope } from 'inzect';
-
-@Scope(Lifecycle.Transient)
-class Service {}
-
-const service1 = container.resolve(Service);
-const service2 = container.resolve(Service);
-
-console.log(service1 === service2); // false
+__[EXAMPLE](/examples/container/scope/transient.ts)__
 ```
 
 ##### Resolution Scope
@@ -336,28 +241,7 @@ console.log(service1 === service2); // false
 ```ts
 // index.ts
 
-import { container, Inject, Lifecycle, Scope } from 'inzect';
-
-@Scope(Lifecycle.Resolution)
-class Service {}
-
-@Inject([Service])
-class App {
-  @Inject(Service)
-  readonly #service1!: Service;
-  readonly #service2: Service;
-
-  public constructor(service2: Service) {
-    this.#service2 = service2;
-  }
-
-  run(): void {
-    console.log(this.#service1 === this.#service2); // true
-  }
-}
-
-const app = container.resolve(App);
-app.run();
+__[EXAMPLE](/examples/container/scope/resolution.ts)__
 ```
 
 #### `container.register()`
@@ -375,16 +259,7 @@ Registers a provider with the container.
 ```ts
 // index.ts
 
-import { container, Lifecycle } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-container.register({
-  token: 'logger',
-  provider: {
-    useClass: Logger,
-  },
-  scope: Lifecycle.Resolution,
-});
+__[EXAMPLE](/examples/container/register.ts)__
 ```
 
 #### `container.resolve()`
@@ -401,20 +276,7 @@ Resolves a dependency.
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-const LOGGER_TOKEN = Symbol('logger');
-
-container.register({
-  token: LOGGER_TOKEN,
-  provider: {
-    useClass: Logger,
-  },
-});
-
-const logger = container.resolve<Logger>(LOGGER_TOKEN);
-logger.log('Hello world!');
+__[EXAMPLE](/examples/container/resolve.ts)__
 ```
 
 #### `container.isRegistered()`
@@ -430,13 +292,7 @@ Check if a dependency is registered.
 ```ts
 // index.ts
 
-import { container, Injectable } from 'inzect';
-
-@Injectable()
-class Service {}
-
-console.log(container.isRegistered(Service)); // true
-console.log(container.isRegistered('some-token')); // false
+__[EXAMPLE](/examples/container/is-registered.ts)__
 ```
 
 #### `container.clear()`
@@ -448,21 +304,7 @@ Clears all registered dependencies.
 ```ts
 // index.ts
 
-import { container } from 'inzect';
-
-class Service {}
-
-container.register({
-  token: Service,
-  provider: {
-    useClass: Service,
-  },
-});
-
-console.log(container.isRegistered(Service)); // true
-
-container.clear();
-console.log(container.isRegistered(Service)); // false
+__[EXAMPLE](/examples/container/clear.ts)__
 ```
 
 ## 🧪 Planned Features

@@ -1,5 +1,5 @@
 /** Injection Lifecycle Type. */
-export enum InjectionLifecycle {
+export enum Lifecycle {
   /**
    * Singleton scope.
    *

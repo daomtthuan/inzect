@@ -13,7 +13,7 @@ export interface IDependencyInjectionRegistry {
    * @param token Injection token.
    * @param registration Registration.
    */
-  set<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  set<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
   ): void;
@@ -28,7 +28,7 @@ export interface IDependencyInjectionRegistry {
    *
    * @returns Registrations.
    */
-  get<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  get<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects> | null;
 

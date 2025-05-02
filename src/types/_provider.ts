@@ -1,4 +1,5 @@
 import type { InjectOptions } from './_decorator';
+import type { InjectionToken } from './_token';
 import type { _ClassType } from './_type';
 
 /**
@@ -28,7 +29,7 @@ export type ValueInjectionProvider<TType> = {
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> = {
+export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]> = {
   /** Injects dependencies. */
   inject?: TInjects;
 
@@ -49,7 +50,7 @@ export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TIn
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type InjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> =
+export type InjectionProvider<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]> =
   | ClassInjectionProvider<TType>
   | ValueInjectionProvider<TType>
   | FactoryInjectionProvider<TType, TDependencies, TInjects>;

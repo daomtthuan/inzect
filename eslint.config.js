@@ -13,6 +13,8 @@ export default TSEslint.config(
       '**/dist/**/*',
       // Configs
       '**/*.config.js',
+      // Examples
+      '**/examples/**/*',
     ],
   },
   {

@@ -1,6 +1,7 @@
 import type { InjectOptions } from './_decorator';
-import type { InjectionLifecycle } from './_lifecycle';
+import type { Lifecycle } from './_lifecycle';
 import type { InjectionProvider } from './_provider';
+import type { InjectionToken } from './_token';
 
 /**
  * Registration.
@@ -9,12 +10,12 @@ import type { InjectionProvider } from './_provider';
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type Registration<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> = {
+export type Registration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]> = {
   /** Injection Provider. */
   provider: InjectionProvider<TType, TDependencies, TInjects>;
 
   /** Injection Lifecycle Scope. */
-  scope: InjectionLifecycle;
+  scope: Lifecycle;
 
   /** Resolved Instance. */
   instance?: TType;

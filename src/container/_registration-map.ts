@@ -1,4 +1,4 @@
-import type { _InjectionTokenMapKey, InjectOptions, Registration } from '~/types';
+import type { _InjectionTokenMapKey, InjectionToken, InjectOptions, Registration } from '~/types';
 
 /**
  * Registration Map.
@@ -14,5 +14,5 @@ export class _RegistrationMap<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TDependencies extends unknown[] = any[],
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TInjects extends InjectOptions<unknown>[] = InjectOptions<any>[],
+  TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[] = any[],
 > extends WeakMap<_InjectionTokenMapKey<TType>, Registration<TType, TDependencies, TInjects>[]> {}

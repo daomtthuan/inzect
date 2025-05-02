@@ -1,4 +1,4 @@
-import type { _ClassDecorator, _ClassType, InjectionLifecycle } from '~/types';
+import type { _ClassDecorator, _ClassType, Lifecycle } from '~/types';
 
 import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
@@ -13,7 +13,7 @@ import { _InjectionTokenHelper } from '~/helpers';
  *
  * @returns TTarget decorator.
  */
-export function Scope<TTarget extends _ClassType>(scope: InjectionLifecycle): _ClassDecorator<TTarget> {
+export function Scope<TTarget extends _ClassType>(scope: Lifecycle): _ClassDecorator<TTarget> {
   return (target) => {
     container.register({
       token: target,

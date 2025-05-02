@@ -21,7 +21,7 @@ import type {
 import { _InjectConstants } from '~/constants';
 import { RegistrationError, ResolutionError } from '~/errors';
 import { _InjectionTokenHelper, _ProviderHelper, _TypeHelper } from '~/helpers';
-import { InjectionLifecycle } from '~/types';
+import { Lifecycle } from '~/types';
 import { _Registry } from './_registry';
 import { _ResolutionContext } from './_resolution-context';
 
@@ -39,18 +39,18 @@ export class _Container implements IDependencyInjectionContainer {
   /** @inheritdoc */
   public register<TType>(options: ValueRegisterOptions<TType>): void;
   /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  public register<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     options: FactoryRegisterOptions<TType, TDependencies, TInjects>,
   ): void;
   /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  public register<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     options: RegisterOptions<TType, TDependencies, TInjects>,
   ): void {
     const token = options.token;
 
     this.#registry.set(token, {
       provider: options.provider,
-      scope: options.scope ?? InjectionLifecycle.Transient,
+      scope: options.scope ?? Lifecycle.Transient,
     });
   }
 
@@ -78,6 +78,11 @@ export class _Container implements IDependencyInjectionContainer {
     }
 
     return this.#resolveRegistration(token, registration, context);
+  }
+
+  /** @inheritdoc */
+  public isRegistered<TType>(token: InjectionToken<TType>): boolean {
+    return this.#registry.has(token);
   }
 
   /** @inheritdoc */
@@ -151,23 +156,23 @@ export class _Container implements IDependencyInjectionContainer {
     });
   }
 
-  #resolveLifecycleRegistration<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  #resolveLifecycleRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
     context: IResolutionContext,
   ): [isResolved: false] | [isResolved: true, instance: TType] {
-    if (registration.scope === InjectionLifecycle.Singleton && registration.instance !== undefined) {
+    if (registration.scope === Lifecycle.Singleton && registration.instance !== undefined) {
       return [true, registration.instance];
     }
 
-    if (registration.scope === InjectionLifecycle.Resolution && context.hasInstance(token)) {
+    if (registration.scope === Lifecycle.Resolution && context.hasInstance(token)) {
       return [true, context.getInstance(token)];
     }
 
     return [false];
   }
 
-  #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
     context: IResolutionContext,
@@ -187,7 +192,7 @@ export class _Container implements IDependencyInjectionContainer {
       });
     }
 
-    if (registration.scope === InjectionLifecycle.Singleton) {
+    if (registration.scope === Lifecycle.Singleton) {
       registration.instance = instance;
     }
 
@@ -197,11 +202,11 @@ export class _Container implements IDependencyInjectionContainer {
   #resolveClassRegistration<TType>(
     token: InjectionToken<TType>,
     provider: ClassInjectionProvider<TType>,
-    scope: InjectionLifecycle,
+    scope: Lifecycle,
     context: IResolutionContext,
   ): TType {
     const instance = this.#constructInstance(token, provider.useClass, context);
-    if (scope === InjectionLifecycle.Resolution) {
+    if (scope === Lifecycle.Resolution) {
       context.setInstance(token, instance);
     }
 
@@ -211,26 +216,29 @@ export class _Container implements IDependencyInjectionContainer {
   #resolveValueRegistration<TType>(
     token: InjectionToken<TType>,
     provider: ValueInjectionProvider<TType>,
-    scope: InjectionLifecycle,
+    scope: Lifecycle,
     context: IResolutionContext,
   ): TType {
     const instance = provider.useValue;
-    if (scope === InjectionLifecycle.Resolution) {
+    if (scope === Lifecycle.Resolution) {
       context.setInstance(token, instance);
     }
 
     return instance;
   }
 
-  #resolveFactoryRegistration<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+  #resolveFactoryRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
     token: InjectionToken<TType>,
     provider: FactoryInjectionProvider<TType, TDependencies, TInjects>,
-    scope: InjectionLifecycle,
+    scope: Lifecycle,
     context: IResolutionContext,
   ): TType {
-    const dependencies = (provider.inject?.map((inject) => this._internalResolve(inject, context)) ?? []) as TDependencies;
+    const dependencies = (provider.inject?.map((inject) => {
+      const options = this.#resolveResolveOptions(inject);
+      this._internalResolve(options, context);
+    }) ?? []) as TDependencies;
     const instance = provider.useFactory(...dependencies);
-    if (scope === InjectionLifecycle.Resolution) {
+    if (scope === Lifecycle.Resolution) {
       context.setInstance(token, instance);
     }
 

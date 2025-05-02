@@ -1,6 +1,6 @@
 import type { Except } from 'type-fest';
 import type { OptionalResolveOptions, RequiredResolveOptions } from './_container';
-import type { InjectionLifecycle } from './_lifecycle';
+import type { Lifecycle } from './_lifecycle';
 import type { InjectionToken } from './_token';
 import type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
 
@@ -21,7 +21,7 @@ export type InjectableOptions<TType> = {
    *
    * @default InjectionLifecycle.Transient
    */
-  scope?: InjectionLifecycle | undefined;
+  scope?: Lifecycle | undefined;
 };
 
 /**

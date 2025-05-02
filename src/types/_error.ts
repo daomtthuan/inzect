@@ -22,7 +22,11 @@ type _ErrorOptionsBase = {
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type RegistrationErrorOptions<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> = _ErrorOptionsBase & {
+export type RegistrationErrorOptions<
+  TType,
+  TDependencies extends unknown[],
+  TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[],
+> = _ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
 

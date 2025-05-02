@@ -3,7 +3,7 @@ import type { _ClassDecorator, _ClassType, InjectableOptions, InjectionToken } f
 import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
 import { _InjectionTokenHelper } from '~/helpers';
-import { InjectionLifecycle } from '~/types';
+import { Lifecycle } from '~/types';
 
 /**
  * Decorator factory to mark a class as injectable.
@@ -43,7 +43,7 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
       provider: {
         useClass: target,
       },
-      scope: options?.scope ?? InjectionLifecycle.Transient,
+      scope: options?.scope ?? Lifecycle.Transient,
     });
   };
 }
@@ -60,12 +60,12 @@ function resolveInjectableOptions<TType>(tokenOrOptions: InjectionToken<TType> |
   if (_InjectionTokenHelper.isPrimitiveInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {
     return {
       token: tokenOrOptions,
-      scope: InjectionLifecycle.Transient,
+      scope: Lifecycle.Transient,
     };
   }
 
   return {
     token: tokenOrOptions.token,
-    scope: tokenOrOptions.scope ?? InjectionLifecycle.Transient,
+    scope: tokenOrOptions.scope ?? Lifecycle.Transient,
   };
 }

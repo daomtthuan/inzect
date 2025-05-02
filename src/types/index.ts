@@ -17,4 +17,4 @@ export type { IResolutionContext } from './_resolution';
 export type { _InjectionTokenMapKey, _PrimitiveInjectionTokenMapKey, ClassInjectionToken, InjectionToken, PrimitiveInjectionToken } from './_token';
 export type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
 
-export { InjectionLifecycle } from './_lifecycle';
+export { Lifecycle } from './_lifecycle';
