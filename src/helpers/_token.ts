@@ -17,10 +17,10 @@ export class _InjectionTokenHelper {
    *
    * @param token Injection token.
    *
-   * @returns True if the token is a string injection token, false otherwise.
+   * @returns `true` if the token is a string injection token, `false` otherwise.
    */
-  public static isStringInjectionToken<TType>(token: InjectionToken<TType>): token is string {
-    return typeof token === 'string';
+  public static isStringInjectionToken(token: unknown): token is string {
+    return typeof token === 'string' && !!token;
   }
 
   /**
@@ -28,9 +28,9 @@ export class _InjectionTokenHelper {
    *
    * @param token Injection token.
    *
-   * @returns True if the token is a class injection token, false otherwise.
+   * @returns `true` if the token is a class injection token, `false` otherwise.
    */
-  public static isClassInjectionToken<TType>(token: InjectionToken<TType>): token is _ClassType<TType> {
+  public static isClassInjectionToken<TType>(token: unknown): token is _ClassType<TType> {
     return _TypeHelper.isClass(token);
   }
 

@@ -3,10 +3,10 @@ import type { AbstractClass, Class } from 'type-fest';
 /**
  * Class Type.
  *
- * @template T Type of instance.
+ * @template TType Type of instance.
  * @internal
  */
-export type _ClassType<T = any> = Class<T> | AbstractClass<T>;
+export type _ClassType<TType = unknown> = Class<TType> | AbstractClass<TType>;
 
 /**
  * Class decorator.

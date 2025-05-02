@@ -1,4 +1,4 @@
-import type { IDependencyInjectionRegistry, InjectionToken, Registration } from '~/types';
+import type { IDependencyInjectionRegistry, InjectionToken, InjectOptions, Registration } from '~/types';
 
 import { _InjectionTokenHelper } from '~/helpers';
 import { _RegistrationMap } from './_registration-map';
@@ -12,8 +12,11 @@ export class _Registry implements IDependencyInjectionRegistry {
   #registrationMap = new _RegistrationMap();
 
   /** @inheritdoc */
-  public set<TType>(token: InjectionToken<TType>, registration: Registration<TType>): void {
-    const registrations = this.#getRegistrations(token);
+  public set<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+    registration: Registration<TType, TDependencies, TInjects>,
+  ): void {
+    const registrations = this.#getRegistrations<TType, TDependencies, TInjects>(token);
     registrations.push(registration);
   }
 
@@ -21,17 +24,24 @@ export class _Registry implements IDependencyInjectionRegistry {
    * Set registrations for the token.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param token Injection token.
    * @param registrations Registrations.
    */
-  public setAll<TType>(token: InjectionToken<TType>, registrations: Registration<TType>[]): void {
+  public setAll<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+    registrations: Registration<TType, TDependencies, TInjects>[],
+  ): void {
     const key = _InjectionTokenHelper.createMapKey(token);
     this.#registrationMap.set(key, registrations);
   }
 
   /** @inheritdoc */
-  public get<TType>(token: InjectionToken<TType>): Registration<TType> | null {
-    const registrations = this.#getRegistrations(token);
+  public get<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+  ): Registration<TType, TDependencies, TInjects> | null {
+    const registrations = this.#getRegistrations<TType, TDependencies, TInjects>(token);
     return registrations[registrations.length - 1] ?? null;
   }
 
@@ -39,11 +49,15 @@ export class _Registry implements IDependencyInjectionRegistry {
    * Get all registrations for the token.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param token Injection token.
    *
    * @returns Registrations.
    */
-  public getAll<TType>(token: InjectionToken<TType>): Registration<TType>[] {
+  public getAll<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+  ): Registration<TType, TDependencies, TInjects>[] {
     return this.#getRegistrations(token);
   }
 
@@ -58,12 +72,14 @@ export class _Registry implements IDependencyInjectionRegistry {
     this.#registrationMap = new _RegistrationMap();
   }
 
-  #getRegistrations<TType>(token: InjectionToken<TType>): Registration<TType>[] {
+  #getRegistrations<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+  ): Registration<TType, TDependencies, TInjects>[] {
     const key = _InjectionTokenHelper.createMapKey(token);
     if (!this.#registrationMap.has(key)) {
       this.#registrationMap.set(key, []);
     }
 
-    return this.#registrationMap.get(key)!;
+    return this.#registrationMap.get(key) as Registration<TType, TDependencies, TInjects>[];
   }
 }

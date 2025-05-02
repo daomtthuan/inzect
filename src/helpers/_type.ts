@@ -13,7 +13,7 @@ export class _TypeHelper {
    * @template TType Type of instance.
    * @param value Value.
    *
-   * @returns True if the value is {@link Class}, false otherwise.
+   * @returns `true` if the value is {@link Class}, `false` otherwise.
    */
   public static isClass<TType>(value: unknown): value is Class<TType> {
     return typeof value === 'function' && value.toString().startsWith('class ');

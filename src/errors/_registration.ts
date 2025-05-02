@@ -1,16 +1,18 @@
-import type { InjectionToken, Registration, RegistrationErrorOptions } from '~/types';
+import type { InjectionToken, InjectOptions, Registration, RegistrationErrorOptions } from '~/types';
 
 /**
  * Dependency Registration Error.
  *
  * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
  */
-export class RegistrationError<TType = any> extends Error {
+export class RegistrationError<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> extends Error {
   readonly #token: InjectionToken<TType>;
-  readonly #registration: Registration<TType>;
+  readonly #registration: Registration<TType, TDependencies, TInjects>;
 
   /** @param options Registration Error Options. */
-  public constructor(options: RegistrationErrorOptions<TType>) {
+  public constructor(options: RegistrationErrorOptions<TType, TDependencies, TInjects>) {
     super(options.message, {
       cause: {
         ...options.cause,
@@ -29,7 +31,7 @@ export class RegistrationError<TType = any> extends Error {
   }
 
   /** @returns Registration. */
-  public get registration(): Registration<TType> {
+  public get registration(): Registration<TType, TDependencies, TInjects> {
     return this.#registration;
   }
 }

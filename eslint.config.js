@@ -31,7 +31,6 @@ export default TSEslint.config(
     rules: {
       // Off
       'require-await': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
 
       // Warn
       'complexity': ['warn', { variant: 'modified' }],

@@ -1,8 +1,20 @@
+import type { _ClassDecorator, _ClassType, InjectableOptions, InjectionToken } from '~/types';
+
 import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
 import { _InjectionTokenHelper } from '~/helpers';
-import { type _ClassDecorator, type _ClassType, type InjectableOptions } from '~/types';
+import { InjectionLifecycle } from '~/types';
 
+/**
+ * Decorator factory to mark a class as injectable.
+ *
+ * @template TTarget Target class.
+ * @template TType Type of instance.
+ * @param token Injection Token.
+ *
+ * @returns Injectable decorator.
+ */
+export function Injectable<TTarget extends _ClassType, TType>(token?: InjectionToken<TType>): _ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class as injectable.
  *
@@ -12,12 +24,48 @@ import { type _ClassDecorator, type _ClassType, type InjectableOptions } from '~
  *
  * @returns Injectable decorator.
  */
-export function Injectable<TTarget extends _ClassType, TType>(options?: InjectableOptions<TType>): _ClassDecorator<TTarget> {
+export function Injectable<TTarget extends _ClassType, TType>(options: InjectableOptions<TType>): _ClassDecorator<TTarget>;
+/**
+ * Decorator factory to mark a class as injectable.
+ *
+ * @template TTarget Target class.
+ * @template TType Type of instance.
+ * @param tokenOrOptions Injection Token or Injectable options.
+ *
+ * @returns Injectable decorator.
+ */
+export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: InjectionToken<TType> | InjectableOptions<TType>): _ClassDecorator<TTarget> {
+  const options = tokenOrOptions ? resolveInjectableOptions(tokenOrOptions) : undefined;
+
   return (target) => {
     container.register({
       token: options?.token ?? target,
-      provider: { useClass: target },
-      scope: options?.scope,
+      provider: {
+        useClass: target,
+      },
+      scope: options?.scope ?? InjectionLifecycle.Transient,
     });
+  };
+}
+
+/**
+ * Resolve Injectable options.
+ *
+ * @template TType Type of instance.
+ * @param tokenOrOptions Injection Token or Injectable options.
+ *
+ * @returns Resolved Injectable options.
+ */
+function resolveInjectableOptions<TType>(tokenOrOptions: InjectionToken<TType> | InjectableOptions<TType>): InjectableOptions<TType> {
+  if (_InjectionTokenHelper.isStringInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {
+    return {
+      token: tokenOrOptions,
+      scope: InjectionLifecycle.Transient,
+    };
+  }
+
+  return {
+    token: tokenOrOptions.token,
+    scope: tokenOrOptions.scope ?? InjectionLifecycle.Transient,
   };
 }

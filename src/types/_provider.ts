@@ -1,4 +1,4 @@
-import type { IDependencyInjectionContainer } from './_container';
+import type { InjectOptions } from './_decorator';
 import type { _ClassType } from './_type';
 
 /**
@@ -25,8 +25,13 @@ export type ValueInjectionProvider<TType> = {
  * Factory Injection Provider.
  *
  * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
  */
-export type FactoryInjectionProvider<TType> = {
+export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> = {
+  /** Injects dependencies. */
+  inject?: TInjects;
+
   /**
    * Provides a factory.
    *
@@ -34,12 +39,17 @@ export type FactoryInjectionProvider<TType> = {
    *
    * @returns Instance to provide.
    */
-  useFactory: (container: IDependencyInjectionContainer) => TType;
+  useFactory: (...dependencies: TDependencies) => TType;
 };
 
 /**
  * Injection Provider.
  *
  * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
  */
-export type InjectionProvider<TType> = ClassInjectionProvider<TType> | ValueInjectionProvider<TType> | FactoryInjectionProvider<TType>;
+export type InjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> =
+  | ClassInjectionProvider<TType>
+  | ValueInjectionProvider<TType>
+  | FactoryInjectionProvider<TType, TDependencies, TInjects>;

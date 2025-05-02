@@ -5,7 +5,7 @@ import type { InjectionToken, ResolutionErrorOptions } from '~/types';
  *
  * @template TType Type of instance.
  */
-export class ResolutionError<TType = any> extends Error {
+export class ResolutionError<TType> extends Error {
   readonly #token: InjectionToken<TType>;
 
   /** @param options Resolution Error Options. */

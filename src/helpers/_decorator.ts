@@ -15,7 +15,7 @@ export class _DecoratorHelper {
    * @template TDecorate Decorated class.
    * @param args Arguments.
    *
-   * @returns True if the arguments are valid for a class decorator, false otherwise.
+   * @returns `true` if the arguments are valid for a class decorator, `false` otherwise.
    */
   public static isClassDecoratorParameters<TTarget extends _ClassType, TDecorate extends _ClassType>(
     args: [target: TTarget | undefined, context: DecoratorContext],
@@ -32,7 +32,7 @@ export class _DecoratorHelper {
    * @template TTransform Transformed field value.
    * @param args Arguments.
    *
-   * @returns True if the arguments are valid for a class field decorator, false otherwise.
+   * @returns `true` if the arguments are valid for a class field decorator, `false` otherwise.
    */
   public static isClassFieldDecoratorParameters<TValue, TTransform = TValue>(
     args: [_: unknown, context: DecoratorContext],

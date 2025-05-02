@@ -1,4 +1,4 @@
-import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from '~/types';
+import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, InjectOptions, ValueInjectionProvider } from '~/types';
 
 /**
  * Helper for Provider.
@@ -10,11 +10,15 @@ export class _ProviderHelper {
    * Check if the provider is {@link ClassInjectionProvider}.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param provider Provider.
    *
-   * @returns True if the provider is {@link ClassInjectionProvider}, false otherwise.
+   * @returns `true` if the provider is {@link ClassInjectionProvider}, `false` otherwise.
    */
-  public static isClassProvider<TType>(provider: InjectionProvider<TType>): provider is ClassInjectionProvider<TType> {
+  public static isClassProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    provider: InjectionProvider<TType, TDependencies, TInjects>,
+  ): provider is ClassInjectionProvider<TType> {
     return 'useClass' in provider && typeof provider.useClass === 'function';
   }
 
@@ -22,11 +26,15 @@ export class _ProviderHelper {
    * Check if the provider is {@link ValueInjectionProvider}.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param provider Provider.
    *
-   * @returns True if the provider is {@link ValueInjectionProvider}, false otherwise.
+   * @returns `true` if the provider is {@link ValueInjectionProvider}, `false` otherwise.
    */
-  public static isValueProvider<TType>(provider: InjectionProvider<TType>): provider is ValueInjectionProvider<TType> {
+  public static isValueProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    provider: InjectionProvider<TType, TDependencies, TInjects>,
+  ): provider is ValueInjectionProvider<TType> {
     return 'useValue' in provider;
   }
 
@@ -34,11 +42,15 @@ export class _ProviderHelper {
    * Check if the provider is {@link FactoryInjectionProvider}.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param provider Provider.
    *
-   * @returns True if the provider is {@link FactoryInjectionProvider}, false otherwise.
+   * @returns `true` if the provider is {@link FactoryInjectionProvider}, `false` otherwise.
    */
-  public static isFactoryProvider<TType>(provider: InjectionProvider<TType>): provider is FactoryInjectionProvider<TType> {
+  public static isFactoryProvider<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    provider: InjectionProvider<TType, TDependencies, TInjects>,
+  ): provider is FactoryInjectionProvider<TType, TDependencies, TInjects> {
     return 'useFactory' in provider && typeof provider.useFactory === 'function';
   }
 }

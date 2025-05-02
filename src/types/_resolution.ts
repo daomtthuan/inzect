@@ -25,7 +25,7 @@ export interface IResolutionContext {
    * @template TType Type of instance.
    * @param token Injection token.
    *
-   * @returns True if the context has an instance for the token, false otherwise.
+   * @returns `true` if the context has an instance for the token, `false` otherwise.
    */
   hasInstance<TType>(token: InjectionToken<TType>): boolean;
 

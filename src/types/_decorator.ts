@@ -19,7 +19,7 @@ export type InjectableOptions<TType> = {
   /**
    * Injection Lifecycle Scope.
    *
-   * @default InjectionLifecycle.Singleton
+   * @default InjectionLifecycle.Transient
    */
   scope?: InjectionLifecycle | undefined;
 };

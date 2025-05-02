@@ -1,3 +1,4 @@
+import type { InjectOptions } from './_decorator';
 import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
@@ -7,20 +8,29 @@ export interface IDependencyInjectionRegistry {
    * Set registration.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param token Injection token.
    * @param registration Registration.
    */
-  set<TType>(token: InjectionToken<TType>, registration: Registration<TType>): void;
+  set<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+    registration: Registration<TType, TDependencies, TInjects>,
+  ): void;
 
   /**
    * Get registration.
    *
    * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
    * @param token Injection token.
    *
    * @returns Registrations.
    */
-  get<TType>(token: InjectionToken<TType>): Registration<TType> | null;
+  get<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+  ): Registration<TType, TDependencies, TInjects> | null;
 
   /**
    * Check if the registry has a registration for the token.
@@ -28,7 +38,7 @@ export interface IDependencyInjectionRegistry {
    * @template TType Type of instance.
    * @param token Injection token.
    *
-   * @returns True if the registry has a registration for the token, false otherwise.
+   * @returns `true` if the registry has a registration for the token, `false` otherwise.
    */
   has<TType>(token: InjectionToken<TType>): boolean;
 

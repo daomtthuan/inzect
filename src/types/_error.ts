@@ -1,3 +1,4 @@
+import type { InjectOptions } from './_decorator';
 import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
@@ -18,13 +19,15 @@ type _ErrorOptionsBase = {
  * Registration Error Options.
  *
  * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
  */
-export type RegistrationErrorOptions<TType> = _ErrorOptionsBase & {
+export type RegistrationErrorOptions<TType, TDependencies extends unknown[], TInjects extends InjectOptions<unknown>[]> = _ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
 
   /** Registration. */
-  registration: Registration<TType>;
+  registration: Registration<TType, TDependencies, TInjects>;
 };
 
 /**
