@@ -10,7 +10,7 @@ import { _TypeHelper } from './_type';
  */
 export class _InjectionTokenHelper {
   /** String Injection Token Map. */
-  public static readonly stringKeyMap = new Map<string, _StringInjectionTokenMapKey>();
+  public static readonly stringKeyMap: Map<string, _StringInjectionTokenMapKey> = new Map();
 
   /**
    * Check if the token is a string injection token.
