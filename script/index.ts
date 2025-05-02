@@ -10,7 +10,9 @@ export class Script extends ScriptBase {
     const [_, __, scriptName] = Process.argv;
     const script: Class<ScriptBase> = (await import(`./scripts/${scriptName}`)).default;
     if (!script) {
-      throw new Error(`Script "${scriptName}" not found!`);
+      throw new Error(`Script "${scriptName}" not found!`, {
+        cause: { argv: Process.argv },
+      });
     }
 
     await Promise.resolve(new script().run());

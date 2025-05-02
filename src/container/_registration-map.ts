@@ -1,4 +1,4 @@
-import type { InjectionToken, Registration } from '~/types';
+import type { _InjectionTokenMapKey, Registration } from '~/types';
 
 /**
  * Registration Map.
@@ -6,4 +6,4 @@ import type { InjectionToken, Registration } from '~/types';
  * @template TType Type of instance.
  * @internal
  */
-export class _RegistrationMap<TType = any> extends WeakMap<InjectionToken<TType>, Registration<TType>[]> {}
+export class _RegistrationMap<TType = any> extends WeakMap<_InjectionTokenMapKey<TType>, Registration<TType>[]> {}

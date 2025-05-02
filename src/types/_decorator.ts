@@ -2,7 +2,7 @@ import type { Except } from 'type-fest';
 import type { OptionalResolveOptions, RequiredResolveOptions } from './_container';
 import type { InjectionLifecycle } from './_lifecycle';
 import type { InjectionToken } from './_token';
-import type { _ClassType } from './_type';
+import type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
 
 /**
  * Injectable Options.
@@ -44,3 +44,20 @@ export type OptionalInjectOptions<TType> = Except<OptionalResolveOptions<TType>,
  * @template TType Type of instance.
  */
 export type InjectOptions<TType> = RequiredInjectOptions<TType> | OptionalInjectOptions<TType>;
+
+/**
+ * Inject Parameter.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InjectParameter<TType> = InjectionToken<TType> | InjectOptions<TType> | (InjectionToken<TType> | InjectOptions<TType>)[];
+
+/**
+ * Inject Return.
+ *
+ * @template TTarget Target class.
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InjectReturn<TTarget extends _ClassType, TType> = _ClassDecorator<TTarget> | _ClassFieldDecorator<TType, TType | undefined>;

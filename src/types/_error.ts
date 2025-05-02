@@ -1,3 +1,4 @@
+import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
 /**
@@ -5,7 +6,10 @@ import type { InjectionToken } from './_token';
  *
  * @internal
  */
-type _ErrorOptionsBase = ErrorOptions & {
+type _ErrorOptionsBase = {
+  /** Error cause. */
+  cause?: object;
+
   /** Error message. */
   message: string;
 };
@@ -18,6 +22,9 @@ type _ErrorOptionsBase = ErrorOptions & {
 export type RegistrationErrorOptions<TType> = _ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
+
+  /** Registration. */
+  registration: Registration<TType>;
 };
 
 /**
@@ -30,8 +37,12 @@ export type ResolutionErrorOptions<TType> = _ErrorOptionsBase & {
   token: InjectionToken<TType>;
 };
 
-/** Argument Error Options. */
-export type ArgumentErrorOptions = _ErrorOptionsBase & {
-  /** Argument name. */
-  argument: string;
+/**
+ * Argument Error Options.
+ *
+ * @template TArgument Argument type.
+ */
+export type ArgumentErrorOptions<TArgument> = _ErrorOptionsBase & {
+  /** Argument. */
+  argument: TArgument;
 };

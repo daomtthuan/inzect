@@ -1,5 +1,6 @@
 import type { IDependencyInjectionRegistry, InjectionToken, Registration } from '~/types';
 
+import { _InjectionTokenHelper } from '~/helpers';
 import { _RegistrationMap } from './_registration-map';
 
 /**
@@ -24,7 +25,8 @@ export class _Registry implements IDependencyInjectionRegistry {
    * @param registrations Registrations.
    */
   public setAll<TType>(token: InjectionToken<TType>, registrations: Registration<TType>[]): void {
-    this.#registrationMap.set(token, registrations);
+    const key = _InjectionTokenHelper.createMapKey(token);
+    this.#registrationMap.set(key, registrations);
   }
 
   /** @inheritdoc */
@@ -57,10 +59,11 @@ export class _Registry implements IDependencyInjectionRegistry {
   }
 
   #getRegistrations<TType>(token: InjectionToken<TType>): Registration<TType>[] {
-    if (!this.#registrationMap.has(token)) {
-      this.#registrationMap.set(token, []);
+    const key = _InjectionTokenHelper.createMapKey(token);
+    if (!this.#registrationMap.has(key)) {
+      this.#registrationMap.set(key, []);
     }
 
-    return this.#registrationMap.get(token)!;
+    return this.#registrationMap.get(key)!;
   }
 }

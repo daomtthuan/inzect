@@ -19,7 +19,7 @@ export default TSEslint.config(
     languageOptions: {
       globals: Globals.node,
       parserOptions: {
-        project: './tsconfig.eslint.json',
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -36,6 +36,7 @@ export default TSEslint.config(
       // Warn
       'complexity': ['warn', { variant: 'modified' }],
       'max-depth': 'warn',
+      'arrow-body-style': ['error', 'as-needed'],
       '@typescript-eslint/typedef': ['warn', { parameter: true }],
       '@typescript-eslint/explicit-function-return-type': ['warn', { allowExpressions: true }],
       '@typescript-eslint/explicit-module-boundary-types': ['warn'],

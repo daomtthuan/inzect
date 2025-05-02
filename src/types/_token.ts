@@ -1,22 +1,26 @@
-import type { Primitive } from 'type-fest';
 import type { _ClassType } from './_type';
-
-/** Injection Token Primitive. */
-export type InjectionTokenPrimitive = {
-  /** Token value. */
-  value: Exclude<Primitive, null | undefined>;
-};
-
-/**
- * Injection Token Class.
- *
- * @template TType Type of instance.
- */
-export type InjectionTokenClass<TType> = _ClassType<TType>;
 
 /**
  * Dependency Injection Token.
  *
  * @template TType Type of instance.
  */
-export type InjectionToken<TType> = InjectionTokenPrimitive | InjectionTokenClass<TType>;
+export type InjectionToken<TType> = string | _ClassType<TType>;
+
+/**
+ * String Injection Token Map Key.
+ *
+ * @internal
+ */
+export type _StringInjectionTokenMapKey = {
+  /** Token value. */
+  value: string;
+};
+
+/**
+ * Injection Token Map Key.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InjectionTokenMapKey<TType> = _StringInjectionTokenMapKey | _ClassType<TType>;

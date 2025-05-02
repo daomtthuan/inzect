@@ -1,3 +1,4 @@
+import type { Except } from 'type-fest';
 import type {
   _ClassType,
   ClassInjectionProvider,
@@ -6,6 +7,7 @@ import type {
   FactoryRegisterOptions,
   IDependencyInjectionContainer,
   InjectionToken,
+  InjectOptions,
   IResolutionContext,
   OptionalResolveOptions,
   RegisterOptions,
@@ -16,7 +18,8 @@ import type {
   ValueRegisterOptions,
 } from '~/types';
 
-import { ResolutionError } from '~/errors';
+import { _InjectConstants } from '~/constants';
+import { RegistrationError, ResolutionError } from '~/errors';
 import { _InjectionTokenHelper, _ProviderHelper, _RegistrationHelper, _TypeHelper } from '~/helpers';
 import { InjectionLifecycle } from '~/types';
 import { _Registry } from './_registry';
@@ -29,7 +32,7 @@ import { _ResolutionContext } from './_resolution-context';
  */
 export class _Container implements IDependencyInjectionContainer {
   readonly #registry = new _Registry();
-  #context?: IResolutionContext;
+  #internalResolutionContext?: IResolutionContext | undefined;
 
   /** @inheritdoc */
   public register<TType>(options: ClassRegisterOptions<TType>): void;
@@ -59,43 +62,74 @@ export class _Container implements IDependencyInjectionContainer {
   public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
     const options = this.#resolveResolveOptions(tokenOrOptions);
     const token = options.token;
-    this.#context = options.context ?? new _ResolutionContext();
+    const context = this.#resolveResolutionContext(options.context);
     const optional = options.optional ?? false;
 
     const registration = this.#registry.get(token);
     if (!registration) {
-      return this.#resolveUnregisteredRegistration(token, this.#context, optional);
+      return this.#resolveUnregisteredRegistration(token, optional, context);
     }
 
-    const [isResolved, instance] = this.#resolveLifecycleRegistration(token, registration, this.#context);
+    const [isResolved, instance] = this.#resolveLifecycleRegistration(token, registration, context);
     if (isResolved) {
       return instance;
     }
 
     if (_RegistrationHelper.isClassRegistration(registration)) {
-      return this.#resolveClassRegistration(token, registration, this.#context);
+      return this.#resolveClassRegistration(token, registration, context);
     }
 
     if (_RegistrationHelper.isValueRegistration(registration)) {
-      return this.#resolveValueRegistration(token, registration, this.#context);
+      return this.#resolveValueRegistration(token, registration, context);
     }
 
     if (_RegistrationHelper.isFactoryRegistration(registration)) {
-      return this.#resolveFactoryRegistration(token, registration, this.#context);
+      return this.#resolveFactoryRegistration(token, registration, context);
     }
 
-    throw new ResolutionError({
+    throw new RegistrationError({
       token,
-      message: `Invalid registration found for token: ${token.toString()}`,
-      cause: {
-        registration,
-      },
+      registration,
+      message: `Invalid registration found for token: ${_InjectionTokenHelper.stringify(token)}`,
     });
   }
 
-  /** @returns Resolution context. */
-  public get context(): IResolutionContext | undefined {
-    return this.#context;
+  /** @inheritdoc */
+  public clear(): void {
+    this.#registry.clear();
+    this.#internalResolutionContext = undefined;
+    _InjectionTokenHelper.stringKeyMap.clear();
+  }
+
+  /**
+   * Internal resolve.
+   *
+   * @template TType Type of instance.
+   * @param options Resolve Options without context.
+   * @param context Resolution Context.
+   *
+   * @returns Resolved instance.
+   * @internal
+   */
+  public _internalResolve<TType>(
+    options: Except<ResolveOptions<TType>, 'context'>,
+    context: IResolutionContext | undefined = this.#internalResolutionContext,
+  ): TType | undefined {
+    return !options.optional ?
+        this.resolve({
+          token: options.token,
+          context,
+        })
+      : this.resolve({
+          token: options.token,
+          optional: true,
+          context,
+        });
+  }
+
+  #resolveResolutionContext(context?: IResolutionContext | undefined): IResolutionContext {
+    this.#internalResolutionContext = context ?? new _ResolutionContext();
+    return this.#internalResolutionContext;
   }
 
   #resolveResolveOptions<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): ResolveOptions<TType> {
@@ -108,15 +142,15 @@ export class _Container implements IDependencyInjectionContainer {
     };
   }
 
-  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, context: IResolutionContext, optional: boolean): TType | undefined {
-    if (_InjectionTokenHelper.isPrimitiveInjectionToken(token)) {
+  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean, context: IResolutionContext): TType | undefined {
+    if (_InjectionTokenHelper.isStringInjectionToken(token)) {
       if (optional) {
         return undefined;
       }
 
       throw new ResolutionError({
         token,
-        message: `Attempted to resolve unregistered token: ${token.toString()}`,
+        message: `Attempted to resolve unregistered token: ${_InjectionTokenHelper.stringify(token)}`,
       });
     }
 
@@ -127,7 +161,7 @@ export class _Container implements IDependencyInjectionContainer {
 
     throw new ResolutionError({
       token,
-      message: `Attempted to resolve not accepted token`,
+      message: `Attempted to resolve invalid token`,
     });
   }
 
@@ -176,14 +210,18 @@ export class _Container implements IDependencyInjectionContainer {
     throw new Error('Not implemented');
   }
 
-  #constructInstance<TType>(token: InjectionToken<TType>, constructor: _ClassType<TType>, _context: IResolutionContext): TType {
+  #constructInstance<TType>(token: InjectionToken<TType>, constructor: _ClassType<TType>, context: IResolutionContext): TType {
     if (_TypeHelper.isClass(constructor)) {
-      return new constructor();
+      const injectOptions = (constructor[Symbol.metadata]?.[_InjectConstants.injectClassOptions] as InjectOptions<TType>[]) ?? [];
+
+      const args = injectOptions.map((options) => this._internalResolve(options, context));
+      return new constructor(...args);
     }
 
     throw new ResolutionError({
       token,
       message: `Attempted to construct not a class`,
+      cause: { constructor },
     });
   }
 }

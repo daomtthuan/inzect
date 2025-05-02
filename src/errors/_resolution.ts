@@ -5,20 +5,23 @@ import type { InjectionToken, ResolutionErrorOptions } from '~/types';
  *
  * @template TType Type of instance.
  */
-export class ResolutionError<Type = any> extends Error {
-  readonly #token: InjectionToken<Type>;
+export class ResolutionError<TType = any> extends Error {
+  readonly #token: InjectionToken<TType>;
 
   /** @param options Resolution Error Options. */
-  public constructor(options: ResolutionErrorOptions<Type>) {
+  public constructor(options: ResolutionErrorOptions<TType>) {
     super(options.message, {
-      cause: options.cause,
+      cause: {
+        ...options.cause,
+        token: options.token,
+      },
     });
 
     this.#token = options.token;
   }
 
   /** @returns Injection token. */
-  public get token(): InjectionToken<Type> {
+  public get token(): InjectionToken<TType> {
     return this.#token;
   }
 }

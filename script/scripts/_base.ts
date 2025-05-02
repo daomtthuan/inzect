@@ -49,7 +49,9 @@ export abstract class ScriptBase {
 
   #getPackageJson(packageJsonPath: string): PackageJson {
     if (!FS.existsSync(packageJsonPath)) {
-      throw new Error(`File 'package.json' not found`);
+      throw new Error(`File 'package.json' not found`, {
+        cause: { packageJsonPath },
+      });
     }
 
     return JSON.parse(FS.readFileSync(packageJsonPath, 'utf-8'));
@@ -57,7 +59,9 @@ export abstract class ScriptBase {
 
   #getBuildDirPath(packageJson: PackageJson): string {
     if (!packageJson.version) {
-      throw new Error(`Package version not found`);
+      throw new Error(`Package version not found`, {
+        cause: { packageJson },
+      });
     }
 
     return Path.join(this.#distDir, packageJson.version);

@@ -1,5 +1,6 @@
 import type { InjectionToken, IResolutionContext } from '~/types';
 
+import { _InjectionTokenHelper } from '~/helpers';
 import { _ResolutionMap } from './_resolution-map';
 
 /**
@@ -12,17 +13,20 @@ export class _ResolutionContext implements IResolutionContext {
 
   /** @inheritdoc */
   public getInstance<TType>(token: InjectionToken<TType>): TType {
-    return this.#resolutionMap.get(token);
+    const key = _InjectionTokenHelper.createMapKey(token);
+    return this.#resolutionMap.get(key);
   }
 
   /** @inheritdoc */
   public setInstance<TType>(token: InjectionToken<TType>, instance: TType): void {
-    this.#resolutionMap.set(token, instance);
+    const key = _InjectionTokenHelper.createMapKey(token);
+    this.#resolutionMap.set(key, instance);
   }
 
   /** @inheritdoc */
   public hasInstance<TType>(token: InjectionToken<TType>): boolean {
-    return this.#resolutionMap.has(token);
+    const key = _InjectionTokenHelper.createMapKey(token);
+    return this.#resolutionMap.has(key);
   }
 
   /** @inheritdoc */

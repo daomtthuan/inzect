@@ -159,4 +159,7 @@ export interface IDependencyInjectionContainer {
    * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
    */
   resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
+
+  /** Clears all registered dependencies. */
+  clear(): void;
 }

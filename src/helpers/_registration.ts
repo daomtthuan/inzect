@@ -1,6 +1,6 @@
 import type { ClassInjectionProvider, FactoryInjectionProvider, Registration, ValueInjectionProvider } from '~/types';
 
-import { _ProviderHelper } from './_provider-helper';
+import { _ProviderHelper } from './_provider';
 
 /**
  * Helper for Registration.

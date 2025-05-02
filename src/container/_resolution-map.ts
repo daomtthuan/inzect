@@ -1,4 +1,4 @@
-import type { InjectionToken } from '~/types';
+import type { _InjectionTokenMapKey } from '~/types';
 
 /**
  * Resolution Map.
@@ -6,4 +6,4 @@ import type { InjectionToken } from '~/types';
  * @template TType Type of instance.
  * @internal
  */
-export class _ResolutionMap<TType = any> extends WeakMap<InjectionToken<TType>, TType> {}
+export class _ResolutionMap<TType = any> extends WeakMap<_InjectionTokenMapKey<TType>, TType> {}

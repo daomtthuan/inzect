@@ -1,7 +1,7 @@
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from '~/types';
 
 /**
- * Provider Helper.
+ * Helper for Provider.
  *
  * @internal
  */

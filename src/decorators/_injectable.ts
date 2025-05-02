@@ -1,5 +1,6 @@
 import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
+import { _InjectionTokenHelper } from '~/helpers';
 import { type _ClassDecorator, type _ClassType, type InjectableOptions } from '~/types';
 
 /**
