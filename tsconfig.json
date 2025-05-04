@@ -27,7 +27,8 @@
     "paths": {
       "~/*": ["./src/*"],
       "inzect": ["./src/index.ts"],
-      "~examples/*": ["./examples/*"]
+      "~examples/*": ["./examples/*"],
+      "~playground/*": ["./script/playground/*"]
     },
 
     // Emit

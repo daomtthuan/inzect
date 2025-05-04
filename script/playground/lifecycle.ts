@@ -1,5 +1,5 @@
 import { container, Inject, Lifecycle, Scope } from 'inzect';
-import { expect } from './common';
+import { expect } from '~playground/modules/test';
 
 @Scope(Lifecycle.Singleton)
 class Singleton {}
