@@ -114,6 +114,20 @@ export type OptionalResolveOptions<TType> = _ResolveOptionsBase<TType> & {
  */
 export type ResolveOptions<TType> = RequiredResolveOptions<TType> | OptionalResolveOptions<TType>;
 
+/**
+ * Internal Resolve Options.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InternalResolveOptions<TType> = {
+  /** Injection Token. */
+  token: InjectionToken<TType>;
+
+  /** `true` if the resolution is optional, `false` otherwise. */
+  optional: boolean;
+};
+
 /** Dependency Injection Container Interface. */
 export interface IDependencyInjectionContainer {
   /**

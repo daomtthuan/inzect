@@ -1,7 +1,8 @@
 import type { _ClassDecorator, _ClassType, Lifecycle } from '~/types';
 
+import { _Container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
-import { _ContainerHelper, _InjectionTokenHelper } from '~/helpers';
+import { _InjectionTokenHelper } from '~/helpers';
 
 /**
  * Decorator factory to mark a class as injectable with scope.
@@ -14,7 +15,7 @@ import { _ContainerHelper, _InjectionTokenHelper } from '~/helpers';
  */
 export function Scope<TTarget extends _ClassType>(scope: Lifecycle): _ClassDecorator<TTarget> {
   return (target) => {
-    _ContainerHelper.globalContainer.register({
+    _Container.instance.register({
       token: target,
       provider: { useClass: target },
       scope,

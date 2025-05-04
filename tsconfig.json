@@ -85,5 +85,5 @@
     // Completeness
     "skipLibCheck": true
   },
-  "include": ["./src", "./script", "./playground", "./examples"]
+  "include": ["./src", "./script", "./examples"]
 }

@@ -1,7 +1,8 @@
 import type { _ClassDecorator, _ClassType, InjectableOptions, InjectionToken } from '~/types';
 
+import { _Container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
-import { _ContainerHelper, _InjectionTokenHelper } from '~/helpers';
+import { _InjectionTokenHelper } from '~/helpers';
 import { Lifecycle } from '~/types';
 
 /**
@@ -37,7 +38,7 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
   const options = tokenOrOptions ? resolveInjectableOptions(tokenOrOptions) : undefined;
 
   return (target) => {
-    _ContainerHelper.globalContainer.register({
+    _Container.instance.register({
       token: options?.token ?? target,
       provider: {
         useClass: target,

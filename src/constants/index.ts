@@ -1,1 +1,1 @@
-export { _InjectConstants } from './_inject';
+export { _MetadataKey } from './_metadata-key';

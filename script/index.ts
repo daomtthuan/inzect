@@ -7,7 +7,7 @@ import { ScriptBase } from './scripts/_base';
 export class Script extends ScriptBase {
   /** Run script. */
   public async run(): Promise<void> {
-    const [_, __, scriptName] = Process.argv;
+    const [_, __, scriptName, ...args] = Process.argv;
     const script: Class<ScriptBase> = (await import(`./scripts/${scriptName}`)).default;
     if (!script) {
       throw new Error(`Script "${scriptName}" not found!`, {
@@ -15,7 +15,7 @@ export class Script extends ScriptBase {
       });
     }
 
-    await Promise.resolve(new script().run());
+    await Promise.resolve(new script().run(...args));
   }
 }
 

@@ -10,12 +10,13 @@ import type {
   OptionalInjectOptions,
   RequiredInjectOptions,
 } from '~/types';
+import type { _InjectConstructorParameterOptions } from '~/types/_decorator';
 
-import { _InjectConstants } from '~/constants';
+import { _MetadataKey } from '~/constants';
 import { _ResolutionContext } from '~/container';
 import { _Container } from '~/container/_container';
 import { ArgumentError } from '~/errors';
-import { _ContainerHelper, _DecoratorHelper, _TypeHelper } from '~/helpers';
+import { _DecoratorHelper, _TypeHelper } from '~/helpers';
 
 /**
  * Decorator factory to mark parameters of constructor will be injected.
@@ -23,11 +24,11 @@ import { _ContainerHelper, _DecoratorHelper, _TypeHelper } from '~/helpers';
  * @overload
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param arg List of Inject Tokens or Inject Options or Inject Tokens Factory or Inject Options Factory.
+ * @param options Inject Constructor Parameter Options.
  *
  * @returns Inject decorator.
  */
-export function Inject<TTarget extends _ClassType, TType>(arg: (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[]): _ClassDecorator<TTarget>;
+export function Inject<TTarget extends _ClassType, TType>(options: _InjectConstructorParameterOptions<TType>): _ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class field will be injected.
  *
@@ -115,8 +116,7 @@ function applyInjectField<TType>(injectArg: _InjectParameter<TType>): (value: TT
     });
   }
 
-  const resolveOptions = _ContainerHelper.resolveResolveOptions(injectArg);
-  return () => _ContainerHelper.globalContainer._internalResolve(resolveOptions.token, resolveOptions.optional);
+  return () => _Container.instance._internalResolve(injectArg);
 }
 
 /**
@@ -135,6 +135,5 @@ function applyInjectClass<TType>(injectArg: _InjectParameter<TType>, context: Cl
     });
   }
 
-  const parametersResolveOptions = injectArg.map((arg) => _ContainerHelper.resolveResolveOptions(arg));
-  context.metadata[_InjectConstants.injectParameterResolveOptions] = parametersResolveOptions;
+  context.metadata[_MetadataKey.InjectConstructorParameterOptions] = injectArg;
 }

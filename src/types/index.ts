@@ -1,4 +1,5 @@
 export type {
+  _InternalResolveOptions,
   ClassRegisterOptions,
   FactoryRegisterOptions,
   IDependencyInjectionContainer,

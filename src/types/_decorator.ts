@@ -73,12 +73,20 @@ export type InjectOptions<TType> = RequiredInjectOptions<TType> | OptionalInject
 export type _InjectTokenOrOptions<TType> = InjectionToken<TType> | InjectOptions<TType>;
 
 /**
+ * Inject Constructor Parameter Options.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InjectConstructorParameterOptions<TType> = (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[];
+
+/**
  * Inject Parameter.
  *
  * @template TType Type of instance.
  * @internal
  */
-export type _InjectParameter<TType> = _InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[];
+export type _InjectParameter<TType> = _InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | _InjectConstructorParameterOptions<TType>;
 
 /**
  * Inject Return.
