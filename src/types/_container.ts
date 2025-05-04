@@ -1,7 +1,6 @@
 import type { _InjectTokenOrOptions } from './_decorator';
 import type { Lifecycle } from './_lifecycle';
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
-import type { IResolutionContext } from './_resolution';
 import type { InjectionToken } from './_token';
 
 /**
@@ -82,12 +81,6 @@ export type RegisterOptions<TType, TDependencies extends unknown[], TInjects ext
 type _ResolveOptionsBase<TType> = {
   /** Injection Token. */
   token: InjectionToken<TType>;
-
-  /**
-   * Resolution context.\
-   * If not provided, the internal resolution context will be used.
-   */
-  context?: IResolutionContext | undefined;
 };
 
 /**

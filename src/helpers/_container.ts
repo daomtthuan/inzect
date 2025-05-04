@@ -27,7 +27,6 @@ export class _ContainerHelper {
       return {
         token,
         optional: arg.optional ?? false,
-        context: 'context' in arg ? arg.context : undefined,
       };
     }
 

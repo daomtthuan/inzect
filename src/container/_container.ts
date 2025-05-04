@@ -1,3 +1,4 @@
+import type { Class } from 'type-fest';
 import type {
   _ClassType,
   _InjectTokenOrOptions,
@@ -7,7 +8,6 @@ import type {
   FactoryRegisterOptions,
   IDependencyInjectionContainer,
   InjectionToken,
-  IResolutionContext,
   OptionalResolveOptions,
   RegisterOptions,
   Registration,
@@ -31,7 +31,7 @@ import { _ResolutionContext } from './_resolution-context';
  */
 export class _Container implements IDependencyInjectionContainer {
   readonly #registry = new _Registry();
-  #internalResolutionContext?: IResolutionContext | undefined;
+  readonly #internalResolutionContext = new _ResolutionContext();
 
   /** @inheritdoc */
   public register<TType>(options: ClassRegisterOptions<TType>): void;
@@ -62,21 +62,11 @@ export class _Container implements IDependencyInjectionContainer {
   /** @inheritdoc */
   public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
     const options = _ContainerHelper.resolveResolveOptions(tokenOrOptions);
-    const token = options.token;
-    const context = this.#resolveResolutionContext(options.context);
-    const optional = options.optional ?? false;
 
-    const registration = this.#registry.get(token);
-    if (!registration) {
-      return this.#resolveUnregisteredRegistration(token, optional, context);
-    }
+    const instance = this._internalResolve(options.token, options.optional);
+    this.#internalResolutionContext.clearInstances();
 
-    const [isResolved, instance] = this.#resolveLifecycleRegistration(token, registration, context);
-    if (isResolved) {
-      return instance;
-    }
-
-    return this.#resolveRegistration(token, registration, context);
+    return instance;
   }
 
   /** @inheritdoc */
@@ -87,44 +77,72 @@ export class _Container implements IDependencyInjectionContainer {
   /** @inheritdoc */
   public clear(): void {
     this.#registry.clear();
-    this.#internalResolutionContext = undefined;
+    this.#internalResolutionContext.clearInstances();
     _InjectionTokenHelper.primitiveKeyMap.clear();
   }
 
   /**
-   * Internal resolve.
+   * Resolve with internal resolution context.
    *
    * @template TType Type of instance.
    * @param token Injection token.
    * @param optional Optional flag.
-   * @param context Resolution Context.
    *
    * @returns Resolved instance.
    * @internal
    */
-  public _internalResolve<TType>(
+  public _internalResolve<TType>(token: InjectionToken<TType>, optional: boolean = false): TType | undefined {
+    const registration = this.#registry.get(token);
+    if (!registration) {
+      return this.#resolveUnregisteredRegistration(token, optional);
+    }
+
+    const [isResolved, instance] = this.#resolveLifecycle(token, registration);
+    if (isResolved) {
+      return instance;
+    }
+
+    return this.#resolveRegistration(token, registration);
+  }
+
+  #registerLifecycle<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
-    optional: boolean = false,
-    context: IResolutionContext | undefined = this.#internalResolutionContext,
-  ): TType | undefined {
-    return !optional ?
-        this.resolve({
-          token,
-          context,
-        })
-      : this.resolve({
-          token,
-          optional: true,
-          context,
-        });
+    registration: Registration<TType, TDependencies, TInjects>,
+    instance: TType | undefined,
+  ): void {
+    switch (registration.scope) {
+      case Lifecycle.Singleton: {
+        registration.instance = instance;
+        break;
+      }
+
+      case Lifecycle.Resolution: {
+        this.#internalResolutionContext.setInstance(token, instance);
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
   }
 
-  #resolveResolutionContext(context?: IResolutionContext | undefined): IResolutionContext {
-    this.#internalResolutionContext = context ?? new _ResolutionContext();
-    return this.#internalResolutionContext;
+  #resolveLifecycle<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
+    token: InjectionToken<TType>,
+    registration: Registration<TType, TDependencies, TInjects>,
+  ): [isResolved: false] | [isResolved: true, instance: TType | undefined] {
+    if (registration.scope === Lifecycle.Singleton && 'instance' in registration) {
+      return [true, registration.instance];
+    }
+
+    if (registration.scope === Lifecycle.Resolution && this.#internalResolutionContext.hasInstance(token)) {
+      return [true, this.#internalResolutionContext.getInstance(token)];
+    }
+
+    return [false];
   }
 
-  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean, context: IResolutionContext): TType | undefined {
+  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean): TType | undefined {
     if (_InjectionTokenHelper.isPrimitiveInjectionToken(token)) {
       if (optional) {
         return undefined;
@@ -138,7 +156,7 @@ export class _Container implements IDependencyInjectionContainer {
 
     // No registration found with this token. But the token is a class, try to construct an instance.
     if (_InjectionTokenHelper.isClassInjectionToken(token)) {
-      return this.#constructInstance(token, token, context);
+      return this.#constructInstance(token);
     }
 
     throw new ResolutionError({
@@ -147,34 +165,17 @@ export class _Container implements IDependencyInjectionContainer {
     });
   }
 
-  #resolveLifecycleRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
-    token: InjectionToken<TType>,
-    registration: Registration<TType, TDependencies, TInjects>,
-    context: IResolutionContext,
-  ): [isResolved: false] | [isResolved: true, instance: TType] {
-    if (registration.scope === Lifecycle.Singleton && registration.instance !== undefined) {
-      return [true, registration.instance];
-    }
-
-    if (registration.scope === Lifecycle.Resolution && context.hasInstance(token)) {
-      return [true, context.getInstance(token)];
-    }
-
-    return [false];
-  }
-
   #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
-    context: IResolutionContext,
   ): TType {
     let instance;
     if (_ProviderHelper.isClassProvider(registration.provider)) {
-      instance = this.#resolveClassRegistration(token, registration.provider, registration.scope, context);
+      instance = this.#resolveClassRegistration(registration.provider);
     } else if (_ProviderHelper.isValueProvider(registration.provider)) {
-      instance = this.#resolveValueRegistration(token, registration.provider, registration.scope, context);
+      instance = this.#resolveValueRegistration(registration.provider);
     } else if (_ProviderHelper.isFactoryProvider(registration.provider)) {
-      instance = this.#resolveFactoryRegistration(token, registration.provider, registration.scope, context);
+      instance = this.#resolveFactoryRegistration(registration.provider);
     } else {
       throw new RegistrationError({
         token,
@@ -183,70 +184,33 @@ export class _Container implements IDependencyInjectionContainer {
       });
     }
 
-    if (registration.scope === Lifecycle.Singleton) {
-      registration.instance = instance;
-    }
+    this.#registerLifecycle(token, registration, instance);
 
     return instance;
   }
 
-  #resolveClassRegistration<TType>(
-    token: InjectionToken<TType>,
-    provider: ClassInjectionProvider<TType>,
-    scope: Lifecycle,
-    context: IResolutionContext,
-  ): TType {
-    const instance = this.#constructInstance(token, provider.useClass, context);
-    if (scope === Lifecycle.Resolution) {
-      context.setInstance(token, instance);
-    }
-
-    return instance;
+  #resolveClassRegistration<TType>(provider: ClassInjectionProvider<TType>): TType {
+    return this.#constructInstance(provider.useClass);
   }
 
-  #resolveValueRegistration<TType>(
-    token: InjectionToken<TType>,
-    provider: ValueInjectionProvider<TType>,
-    scope: Lifecycle,
-    context: IResolutionContext,
-  ): TType {
-    const instance = provider.useValue;
-    if (scope === Lifecycle.Resolution) {
-      context.setInstance(token, instance);
-    }
-
-    return instance;
+  #resolveValueRegistration<TType>(provider: ValueInjectionProvider<TType>): TType {
+    return provider.useValue;
   }
 
   #resolveFactoryRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
-    token: InjectionToken<TType>,
     provider: FactoryInjectionProvider<TType, TDependencies, TInjects>,
-    scope: Lifecycle,
-    context: IResolutionContext,
   ): TType {
     const dependencies = (provider.inject?.map((inject) => {
       const resolveOptions = _ContainerHelper.resolveResolveOptions(inject);
-      this._internalResolve(resolveOptions.token, resolveOptions.optional, context);
+      this._internalResolve(resolveOptions.token, resolveOptions.optional);
     }) ?? []) as TDependencies;
-    const instance = provider.useFactory(...dependencies);
-    if (scope === Lifecycle.Resolution) {
-      context.setInstance(token, instance);
-    }
 
-    return instance;
+    return provider.useFactory(...dependencies);
   }
 
-  #constructInstance<TType>(token: InjectionToken<TType>, constructor: _ClassType<TType>, context: IResolutionContext): TType {
-    if (_TypeHelper.isClass(constructor)) {
-      const parametersResolveOptions = _ContainerHelper.getParametersResolveOptions(constructor);
-      const args = parametersResolveOptions.map((options) => this._internalResolve(options.token, options.optional, context));
-      return new constructor(...args);
-    }
-
-    throw new ResolutionError({
-      token,
-      message: `Attempted to construct not a class`,
-      cause: { constructor },
-    });
+  #constructInstance<TType>(constructor: _ClassType<TType>): TType {
+    const parametersResolveOptions = _ContainerHelper.getParametersResolveOptions(constructor);
+    const args = parametersResolveOptions.map((options) => this._internalResolve(options.token, options.optional));
+    return new (constructor as Class<TType>)(...args);
   }
 }

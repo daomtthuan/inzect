@@ -17,5 +17,5 @@ export type Registration<TType, TDependencies extends unknown[], TInjects extend
   scope: Lifecycle;
 
   /** Resolved Instance. */
-  instance?: TType;
+  instance?: TType | undefined;
 };
