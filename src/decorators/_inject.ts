@@ -84,8 +84,8 @@ export function Inject<TTarget extends _ClassType, TType>(injectArg: _InjectPara
     ...decoratorArgs: [target: TTarget | undefined, context: ClassDecoratorContext | ClassFieldDecoratorContext]
   ): void | ((value: TType) => TType | undefined) => {
     if (_DecoratorHelper.isClassDecoratorParameters(decoratorArgs)) {
-      const [target] = decoratorArgs;
-      return applyInjectClass(injectArg, target);
+      const [_target, context] = decoratorArgs;
+      return applyInjectClass(injectArg, context);
     }
 
     if (_DecoratorHelper.isClassFieldDecoratorParameters(decoratorArgs)) {
@@ -125,9 +125,9 @@ function applyInjectField<TType>(injectArg: _InjectParameter<TType>): (value: TT
  * @template TTarget Target class.
  * @template TType Type of instance.
  * @param injectArg Inject argument.
- * @param target Target class.
+ * @param context Class decorator Context.
  */
-function applyInjectClass<TType>(injectArg: _InjectParameter<TType>, target: _ClassType<TType>): void {
+function applyInjectClass<TType>(injectArg: _InjectParameter<TType>, context: ClassDecoratorContext): void {
   if (!Array.isArray(injectArg) || injectArg.length === 0) {
     throw new ArgumentError({
       argument: injectArg,
@@ -136,5 +136,5 @@ function applyInjectClass<TType>(injectArg: _InjectParameter<TType>, target: _Cl
   }
 
   const parametersResolveOptions = injectArg.map((arg) => _ContainerHelper.resolveResolveOptions(arg));
-  _ContainerHelper.setParametersResolveOptions(target, parametersResolveOptions);
+  context.metadata[_InjectConstants.injectParameterResolveOptions] = parametersResolveOptions;
 }

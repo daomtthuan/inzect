@@ -38,20 +38,6 @@ export class _ContainerHelper {
   }
 
   /**
-   * Set Parameters Resolve Options.
-   *
-   * @template TType Type of instance.
-   * @param constructor Class constructor.
-   * @param parameterResolveOptions Parameters Resolve Options.
-   */
-  public static setParametersResolveOptions<TType>(constructor: _ClassType<TType>, parameterResolveOptions: ResolveOptions<TType>[]): void {
-    constructor[Symbol.metadata] = {
-      ...constructor[Symbol.metadata],
-      [_InjectConstants.injectParameterResolveOptions]: parameterResolveOptions,
-    };
-  }
-
-  /**
    * Get Parameters Resolve Options.
    *
    * @template TType Type of instance.
