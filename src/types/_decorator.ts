@@ -1,7 +1,5 @@
-import type { Except } from 'type-fest';
-import type { OptionalResolveOptions, RequiredResolveOptions } from './_container';
 import type { Lifecycle } from './_lifecycle';
-import type { InjectionToken } from './_token';
+import type { InjectionToken, InjectTokenFactory } from './_token';
 import type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
 
 /**
@@ -25,18 +23,39 @@ export type InjectableOptions<TType> = {
 };
 
 /**
+ * Inject Options Base.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+type _InjectOptionsBase<TType> = {
+  /** Injection Token. */
+  token: InjectionToken<TType> | InjectTokenFactory<TType>;
+};
+
+/**
  * Required Inject Options.
  *
  * @template TType Type of instance.
  */
-export type RequiredInjectOptions<TType> = Except<RequiredResolveOptions<TType>, 'context'>;
+export type RequiredInjectOptions<TType> = _InjectOptionsBase<TType> & {
+  /**
+   * If set to `true`, inject `undefined` if token is not registered.
+   *
+   * @default false
+   */
+  optional?: false | undefined;
+};
 
 /**
  * Optional Inject Options.
  *
  * @template TType Type of instance.
  */
-export type OptionalInjectOptions<TType> = Except<OptionalResolveOptions<TType>, 'context'>;
+export type OptionalInjectOptions<TType> = _InjectOptionsBase<TType> & {
+  /** If set to `true`, inject `undefined` if token is not registered. */
+  optional: true;
+};
 
 /**
  * Inject Options.
@@ -46,12 +65,20 @@ export type OptionalInjectOptions<TType> = Except<OptionalResolveOptions<TType>,
 export type InjectOptions<TType> = RequiredInjectOptions<TType> | OptionalInjectOptions<TType>;
 
 /**
+ * Injection Token or Inject Options.
+ *
+ * @template TType Type of instance.
+ * @internal
+ */
+export type _InjectTokenOrOptions<TType> = InjectionToken<TType> | InjectOptions<TType>;
+
+/**
  * Inject Parameter.
  *
  * @template TType Type of instance.
  * @internal
  */
-export type _InjectParameter<TType> = InjectionToken<TType> | InjectOptions<TType> | (InjectionToken<TType> | InjectOptions<TType>)[];
+export type _InjectParameter<TType> = _InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[];
 
 /**
  * Inject Return.

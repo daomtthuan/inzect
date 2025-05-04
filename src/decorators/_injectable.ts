@@ -1,8 +1,7 @@
 import type { _ClassDecorator, _ClassType, InjectableOptions, InjectionToken } from '~/types';
 
-import { container } from '~/container';
 import { _ResolutionContext } from '~/container/_resolution-context';
-import { _InjectionTokenHelper } from '~/helpers';
+import { _ContainerHelper, _InjectionTokenHelper } from '~/helpers';
 import { Lifecycle } from '~/types';
 
 /**
@@ -20,7 +19,7 @@ export function Injectable<TTarget extends _ClassType, TType>(token?: InjectionT
  *
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param options Injectable options.
+ * @param options Injectable Options.
  *
  * @returns Injectable decorator.
  */
@@ -30,7 +29,7 @@ export function Injectable<TTarget extends _ClassType, TType>(options: Injectabl
  *
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param tokenOrOptions Injection Token or Injectable options.
+ * @param tokenOrOptions Injection Token or Injectable Options.
  *
  * @returns Injectable decorator.
  */
@@ -38,7 +37,7 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
   const options = tokenOrOptions ? resolveInjectableOptions(tokenOrOptions) : undefined;
 
   return (target) => {
-    container.register({
+    _ContainerHelper.globalContainer.register({
       token: options?.token ?? target,
       provider: {
         useClass: target,
@@ -49,12 +48,12 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
 }
 
 /**
- * Resolve Injectable options.
+ * Resolve Injectable Options.
  *
  * @template TType Type of instance.
- * @param tokenOrOptions Injection Token or Injectable options.
+ * @param tokenOrOptions Injection Token or Injectable Options.
  *
- * @returns Resolved Injectable options.
+ * @returns Resolved Injectable Options.
  */
 function resolveInjectableOptions<TType>(tokenOrOptions: InjectionToken<TType> | InjectableOptions<TType>): InjectableOptions<TType> {
   if (_InjectionTokenHelper.isPrimitiveInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {

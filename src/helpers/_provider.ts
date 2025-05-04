@@ -1,4 +1,4 @@
-import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, InjectionToken, InjectOptions, ValueInjectionProvider } from '~/types';
+import type { _InjectTokenOrOptions, ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from '~/types';
 
 /**
  * Helper for Provider.
@@ -16,7 +16,7 @@ export class _ProviderHelper {
    *
    * @returns `true` if the provider is {@link ClassInjectionProvider}, `false` otherwise.
    */
-  public static isClassProvider<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public static isClassProvider<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     provider: InjectionProvider<TType, TDependencies, TInjects>,
   ): provider is ClassInjectionProvider<TType> {
     return 'useClass' in provider && typeof provider.useClass === 'function';
@@ -32,7 +32,7 @@ export class _ProviderHelper {
    *
    * @returns `true` if the provider is {@link ValueInjectionProvider}, `false` otherwise.
    */
-  public static isValueProvider<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public static isValueProvider<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     provider: InjectionProvider<TType, TDependencies, TInjects>,
   ): provider is ValueInjectionProvider<TType> {
     return 'useValue' in provider;
@@ -48,7 +48,7 @@ export class _ProviderHelper {
    *
    * @returns `true` if the provider is {@link FactoryInjectionProvider}, `false` otherwise.
    */
-  public static isFactoryProvider<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public static isFactoryProvider<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     provider: InjectionProvider<TType, TDependencies, TInjects>,
   ): provider is FactoryInjectionProvider<TType, TDependencies, TInjects> {
     return 'useFactory' in provider && typeof provider.useFactory === 'function';

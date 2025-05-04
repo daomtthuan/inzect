@@ -1,4 +1,4 @@
-import type { InjectionToken, InjectOptions, Registration, RegistrationErrorOptions } from '~/types';
+import type { _InjectTokenOrOptions, InjectionToken, Registration, RegistrationErrorOptions } from '~/types';
 
 /**
  * Dependency Registration Error.
@@ -7,7 +7,7 @@ import type { InjectionToken, InjectOptions, Registration, RegistrationErrorOpti
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export class RegistrationError<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]> extends Error {
+export class RegistrationError<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> extends Error {
   readonly #token: InjectionToken<TType>;
   readonly #registration: Registration<TType, TDependencies, TInjects>;
 

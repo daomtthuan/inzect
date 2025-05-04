@@ -1,4 +1,4 @@
-import type { InjectOptions } from './_decorator';
+import type { _InjectTokenOrOptions } from './_decorator';
 import type { Lifecycle } from './_lifecycle';
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
 import type { IResolutionContext } from './_resolution';
@@ -17,7 +17,7 @@ type _RegisterOptionsBase<
   TType,
   TProvider extends InjectionProvider<TType, TDependencies, TInjects>,
   TDependencies extends unknown[] = never,
-  TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[] = never,
+  TInjects extends _InjectTokenOrOptions<unknown>[] = never,
 > = {
   /** Injection Token. */
   token: InjectionToken<TType>;
@@ -54,11 +54,12 @@ export type ValueRegisterOptions<TType> = _RegisterOptionsBase<TType, ValueInjec
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type FactoryRegisterOptions<
+export type FactoryRegisterOptions<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> = _RegisterOptionsBase<
   TType,
-  TDependencies extends unknown[],
-  TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[],
-> = _RegisterOptionsBase<TType, FactoryInjectionProvider<TType, TDependencies, TInjects>, TDependencies, TInjects>;
+  FactoryInjectionProvider<TType, TDependencies, TInjects>,
+  TDependencies,
+  TInjects
+>;
 
 /**
  * Register Options.
@@ -67,7 +68,7 @@ export type FactoryRegisterOptions<
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type RegisterOptions<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]> =
+export type RegisterOptions<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> =
   | ClassRegisterOptions<TType>
   | ValueRegisterOptions<TType>
   | FactoryRegisterOptions<TType, TDependencies, TInjects>;
@@ -127,7 +128,7 @@ export interface IDependencyInjectionContainer {
    *
    * @overload
    * @template TType Type of instance to register.
-   * @param options Class Register options.
+   * @param options Class Register Options.
    */
   register<TType>(options: ClassRegisterOptions<TType>): void;
   /**
@@ -135,7 +136,7 @@ export interface IDependencyInjectionContainer {
    *
    * @overload
    * @template TType Type of instance to register.
-   * @param options Value Register options.
+   * @param options Value Register Options.
    */
   register<TType>(options: ValueRegisterOptions<TType>): void;
   /**
@@ -145,9 +146,9 @@ export interface IDependencyInjectionContainer {
    * @template TType Type of instance to register.
    * @template TDependencies Dependencies types.
    * @template TInjects Inject types.
-   * @param options Factory Register options.
+   * @param options Factory Register Options.
    */
-  register<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  register<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     options: FactoryRegisterOptions<TType, TDependencies, TInjects>,
   ): void;
 
@@ -166,7 +167,7 @@ export interface IDependencyInjectionContainer {
    *
    * @overload
    * @template TType Type of instance to resolve.
-   * @param options Resolve options.
+   * @param options Resolve Options.
    *
    * @returns Resolved instance.
    */
@@ -177,7 +178,7 @@ export interface IDependencyInjectionContainer {
    *
    * @overload
    * @template TType Type of instance to resolve.
-   * @param options Optional Resolve options.
+   * @param options Optional Resolve Options.
    *
    * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
    */

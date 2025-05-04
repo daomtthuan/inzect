@@ -1,6 +1,6 @@
 {
   "name": "inzect",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "description": "Inzect is a lightweight injection container for TypeScript and JavaScript.",
   "author": {

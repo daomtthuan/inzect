@@ -19,6 +19,13 @@ export type ClassInjectionToken<TType> = _ClassType<TType>;
 export type InjectionToken<TType> = PrimitiveInjectionToken | ClassInjectionToken<TType>;
 
 /**
+ * Injection Token Factory.
+ *
+ * @template TType Type of instance.
+ */
+export type InjectTokenFactory<TType> = () => InjectionToken<TType>;
+
+/**
  * Primitive Injection Token Map Key.
  *
  * @internal

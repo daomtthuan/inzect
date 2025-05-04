@@ -4,6 +4,6 @@
  * @internal
  */
 export class _InjectConstants {
-  /** Inject Class arguments. */
-  public static readonly injectClassOptions: symbol = Symbol('InjectClass.options');
+  /** Inject Parameter Resolve Options. */
+  public static readonly injectParameterResolveOptions: symbol = Symbol('Inject.parameterResolveOptions');
 }

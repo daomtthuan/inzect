@@ -1,20 +1,21 @@
-import type { _Container } from '~/container/_container';
 import type {
   _ClassDecorator,
   _ClassFieldDecorator,
   _ClassType,
   _InjectParameter,
   _InjectReturn,
+  _InjectTokenOrOptions,
   InjectionToken,
-  InjectOptions,
+  InjectTokenFactory,
   OptionalInjectOptions,
   RequiredInjectOptions,
 } from '~/types';
 
 import { _InjectConstants } from '~/constants';
-import { _ResolutionContext, container } from '~/container';
+import { _ResolutionContext } from '~/container';
+import { _Container } from '~/container/_container';
 import { ArgumentError } from '~/errors';
-import { _DecoratorHelper } from '~/helpers';
+import { _ContainerHelper, _DecoratorHelper, _TypeHelper } from '~/helpers';
 
 /**
  * Decorator factory to mark parameters of constructor will be injected.
@@ -22,11 +23,11 @@ import { _DecoratorHelper } from '~/helpers';
  * @overload
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param tokenOrOptionsList Injection Token or Inject options list.
+ * @param arg List of Inject Tokens or Inject Options or Inject Tokens Factory or Inject Options Factory.
  *
  * @returns Inject decorator.
  */
-export function Inject<TTarget extends _ClassType, TType>(tokenOrOptionsList: (InjectionToken<TType> | InjectOptions<TType>)[]): _ClassDecorator<TTarget>;
+export function Inject<TTarget extends _ClassType, TType>(arg: (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[]): _ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class field will be injected.
  *
@@ -42,7 +43,7 @@ export function Inject<TType>(token: InjectionToken<TType>): _ClassFieldDecorato
  *
  * @overload
  * @template TType Type of instance.
- * @param options Required Inject options.
+ * @param options Required Inject Options.
  *
  * @returns Inject decorator.
  */
@@ -53,11 +54,21 @@ export function Inject<TType>(options: RequiredInjectOptions<TType>): _ClassFiel
  *
  * @overload
  * @template TType Type of instance.
- * @param options Optional Inject options.
+ * @param options Optional Inject Options.
  *
  * @returns Inject decorator.
  */
 export function Inject<TType>(options: OptionalInjectOptions<TType>): _ClassFieldDecorator<TType, TType | undefined>;
+/**
+ * Decorator factory to mark a class field will be injected.
+ *
+ * @overload
+ * @template TType Type of instance.
+ * @param factory Inject Token Factory.
+ *
+ * @returns Inject decorator.
+ */
+export function Inject<TType>(factory: InjectTokenFactory<TType>): _ClassFieldDecorator<TType>;
 /**
  * Decorator factory to mark a class field will be injected.
  *
@@ -73,8 +84,8 @@ export function Inject<TTarget extends _ClassType, TType>(injectArg: _InjectPara
     ...decoratorArgs: [target: TTarget | undefined, context: ClassDecoratorContext | ClassFieldDecoratorContext]
   ): void | ((value: TType) => TType | undefined) => {
     if (_DecoratorHelper.isClassDecoratorParameters(decoratorArgs)) {
-      const [_target, context] = decoratorArgs;
-      return applyInjectClass(injectArg, context);
+      const [target] = decoratorArgs;
+      return applyInjectClass(injectArg, target);
     }
 
     if (_DecoratorHelper.isClassFieldDecoratorParameters(decoratorArgs)) {
@@ -89,45 +100,23 @@ export function Inject<TTarget extends _ClassType, TType>(injectArg: _InjectPara
 }
 
 /**
- * Resolve Inject options.
- *
- * @template TType Type of instance.
- * @param tokenOrOptions Injection Token or Inject options.
- *
- * @returns Resolved Inject options.
- */
-function resolveInjectOptions<TType>(tokenOrOptions: InjectionToken<TType> | InjectOptions<TType>): InjectOptions<TType> {
-  if (typeof tokenOrOptions === 'object' && 'token' in tokenOrOptions) {
-    return {
-      token: tokenOrOptions.token,
-      optional: tokenOrOptions.optional ?? false,
-    };
-  }
-
-  return {
-    token: tokenOrOptions,
-    optional: false,
-  };
-}
-
-/**
  * Apply Inject field decorator.
  *
  * @template TType Type of instance.
- * @param arg Inject argument.
+ * @param injectArg Inject argument.
  *
  * @returns Return of Inject field decorator.
  */
-function applyInjectField<TType>(arg: _InjectParameter<TType>): (value: TType) => TType | undefined {
-  if (Array.isArray(arg)) {
+function applyInjectField<TType>(injectArg: _InjectParameter<TType>): (value: TType) => TType | undefined {
+  if (Array.isArray(injectArg)) {
     throw new ArgumentError({
-      argument: arg,
+      argument: injectArg,
       message: 'Only one argument is allowed',
     });
   }
 
-  const options = resolveInjectOptions(arg);
-  return () => (container as _Container)._internalResolve(options);
+  const resolveOptions = _ContainerHelper.resolveResolveOptions(injectArg);
+  return () => _ContainerHelper.globalContainer._internalResolve(resolveOptions.token, resolveOptions.optional);
 }
 
 /**
@@ -135,17 +124,17 @@ function applyInjectField<TType>(arg: _InjectParameter<TType>): (value: TType) =
  *
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param arg Inject argument.
- * @param context Decorator Context.
+ * @param injectArg Inject argument.
+ * @param target Target class.
  */
-function applyInjectClass<TType>(arg: _InjectParameter<TType>, context: ClassDecoratorContext): void {
-  if (!Array.isArray(arg) || arg.length === 0) {
+function applyInjectClass<TType>(injectArg: _InjectParameter<TType>, target: _ClassType<TType>): void {
+  if (!Array.isArray(injectArg) || injectArg.length === 0) {
     throw new ArgumentError({
-      argument: arg,
+      argument: injectArg,
       message: 'At least one argument is required',
     });
   }
 
-  const options = arg.map(resolveInjectOptions);
-  context.metadata[_InjectConstants.injectClassOptions] = options;
+  const parametersResolveOptions = injectArg.map((arg) => _ContainerHelper.resolveResolveOptions(arg));
+  _ContainerHelper.setParametersResolveOptions(target, parametersResolveOptions);
 }

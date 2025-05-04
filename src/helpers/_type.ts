@@ -42,4 +42,17 @@ export class _TypeHelper {
   public static isClass<TType>(value: unknown): value is Class<TType> {
     return typeof value === 'function' && value.toString().startsWith('class ');
   }
+
+  /**
+   * Check if the value is function.
+   *
+   * @template TParams Function parameters.
+   * @template TReturn Function return type.
+   * @param value Value.
+   *
+   * @returns `true` if the value is function, `false` otherwise.
+   */
+  public static isFunction<TParams extends unknown[], TReturn>(value: unknown): value is (...args: TParams) => TReturn {
+    return typeof value === 'function' && !_TypeHelper.isClass(value);
+  }
 }

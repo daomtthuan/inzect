@@ -1,4 +1,4 @@
-import type { InjectOptions } from './_decorator';
+import type { _InjectTokenOrOptions } from './_decorator';
 import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
@@ -13,7 +13,7 @@ export interface IDependencyInjectionRegistry {
    * @param token Injection token.
    * @param registration Registration.
    */
-  set<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  set<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
   ): void;
@@ -28,7 +28,7 @@ export interface IDependencyInjectionRegistry {
    *
    * @returns Registrations.
    */
-  get<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  get<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects> | null;
 

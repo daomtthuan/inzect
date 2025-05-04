@@ -1,4 +1,4 @@
-import type { IDependencyInjectionRegistry, InjectionToken, InjectOptions, Registration } from '~/types';
+import type { _InjectTokenOrOptions, IDependencyInjectionRegistry, InjectionToken, Registration } from '~/types';
 
 import { _InjectionTokenHelper } from '~/helpers';
 import { _RegistrationMap } from './_registration-map';
@@ -12,7 +12,7 @@ export class _Registry implements IDependencyInjectionRegistry {
   #registrationMap = new _RegistrationMap();
 
   /** @inheritdoc */
-  public set<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public set<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
   ): void {
@@ -29,7 +29,7 @@ export class _Registry implements IDependencyInjectionRegistry {
    * @param token Injection token.
    * @param registrations Registrations.
    */
-  public setAll<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public setAll<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registrations: Registration<TType, TDependencies, TInjects>[],
   ): void {
@@ -38,7 +38,7 @@ export class _Registry implements IDependencyInjectionRegistry {
   }
 
   /** @inheritdoc */
-  public get<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public get<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects> | null {
     const registrations = this.#getRegistrations<TType, TDependencies, TInjects>(token);
@@ -55,7 +55,7 @@ export class _Registry implements IDependencyInjectionRegistry {
    *
    * @returns Registrations.
    */
-  public getAll<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public getAll<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects>[] {
     return this.#getRegistrations<TType, TDependencies, TInjects>(token);
@@ -72,7 +72,7 @@ export class _Registry implements IDependencyInjectionRegistry {
     this.#registrationMap = new _RegistrationMap();
   }
 
-  #getRegistrations<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  #getRegistrations<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects>[] {
     const key = _InjectionTokenHelper.createMapKey(token);

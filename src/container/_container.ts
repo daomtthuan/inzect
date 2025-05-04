@@ -1,13 +1,12 @@
-import type { Except } from 'type-fest';
 import type {
   _ClassType,
+  _InjectTokenOrOptions,
   ClassInjectionProvider,
   ClassRegisterOptions,
   FactoryInjectionProvider,
   FactoryRegisterOptions,
   IDependencyInjectionContainer,
   InjectionToken,
-  InjectOptions,
   IResolutionContext,
   OptionalResolveOptions,
   RegisterOptions,
@@ -20,7 +19,7 @@ import type {
 
 import { _InjectConstants } from '~/constants';
 import { RegistrationError, ResolutionError } from '~/errors';
-import { _InjectionTokenHelper, _ProviderHelper, _TypeHelper } from '~/helpers';
+import { _ContainerHelper, _InjectionTokenHelper, _ProviderHelper, _TypeHelper } from '~/helpers';
 import { Lifecycle } from '~/types';
 import { _Registry } from './_registry';
 import { _ResolutionContext } from './_resolution-context';
@@ -39,11 +38,11 @@ export class _Container implements IDependencyInjectionContainer {
   /** @inheritdoc */
   public register<TType>(options: ValueRegisterOptions<TType>): void;
   /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public register<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     options: FactoryRegisterOptions<TType, TDependencies, TInjects>,
   ): void;
   /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  public register<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     options: RegisterOptions<TType, TDependencies, TInjects>,
   ): void {
     const token = options.token;
@@ -62,7 +61,7 @@ export class _Container implements IDependencyInjectionContainer {
   public resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
   /** @inheritdoc */
   public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
-    const options = this.#resolveResolveOptions(tokenOrOptions);
+    const options = _ContainerHelper.resolveResolveOptions(tokenOrOptions);
     const token = options.token;
     const context = this.#resolveResolutionContext(options.context);
     const optional = options.optional ?? false;
@@ -96,23 +95,25 @@ export class _Container implements IDependencyInjectionContainer {
    * Internal resolve.
    *
    * @template TType Type of instance.
-   * @param options Resolve Options without context.
+   * @param token Injection token.
+   * @param optional Optional flag.
    * @param context Resolution Context.
    *
    * @returns Resolved instance.
    * @internal
    */
   public _internalResolve<TType>(
-    options: Except<ResolveOptions<TType>, 'context'>,
+    token: InjectionToken<TType>,
+    optional: boolean = false,
     context: IResolutionContext | undefined = this.#internalResolutionContext,
   ): TType | undefined {
-    return !options.optional ?
+    return !optional ?
         this.resolve({
-          token: options.token,
+          token,
           context,
         })
       : this.resolve({
-          token: options.token,
+          token,
           optional: true,
           context,
         });
@@ -121,16 +122,6 @@ export class _Container implements IDependencyInjectionContainer {
   #resolveResolutionContext(context?: IResolutionContext | undefined): IResolutionContext {
     this.#internalResolutionContext = context ?? new _ResolutionContext();
     return this.#internalResolutionContext;
-  }
-
-  #resolveResolveOptions<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): ResolveOptions<TType> {
-    if (typeof tokenOrOptions === 'object' && 'token' in tokenOrOptions) {
-      return tokenOrOptions;
-    }
-
-    return {
-      token: tokenOrOptions,
-    };
   }
 
   #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean, context: IResolutionContext): TType | undefined {
@@ -156,7 +147,7 @@ export class _Container implements IDependencyInjectionContainer {
     });
   }
 
-  #resolveLifecycleRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  #resolveLifecycleRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
     context: IResolutionContext,
@@ -172,7 +163,7 @@ export class _Container implements IDependencyInjectionContainer {
     return [false];
   }
 
-  #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
     context: IResolutionContext,
@@ -227,15 +218,15 @@ export class _Container implements IDependencyInjectionContainer {
     return instance;
   }
 
-  #resolveFactoryRegistration<TType, TDependencies extends unknown[], TInjects extends (InjectionToken<unknown> | InjectOptions<unknown>)[]>(
+  #resolveFactoryRegistration<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     provider: FactoryInjectionProvider<TType, TDependencies, TInjects>,
     scope: Lifecycle,
     context: IResolutionContext,
   ): TType {
     const dependencies = (provider.inject?.map((inject) => {
-      const options = this.#resolveResolveOptions(inject);
-      this._internalResolve(options, context);
+      const resolveOptions = _ContainerHelper.resolveResolveOptions(inject);
+      this._internalResolve(resolveOptions.token, resolveOptions.optional, context);
     }) ?? []) as TDependencies;
     const instance = provider.useFactory(...dependencies);
     if (scope === Lifecycle.Resolution) {
@@ -247,9 +238,8 @@ export class _Container implements IDependencyInjectionContainer {
 
   #constructInstance<TType>(token: InjectionToken<TType>, constructor: _ClassType<TType>, context: IResolutionContext): TType {
     if (_TypeHelper.isClass(constructor)) {
-      const injectOptions = (constructor[Symbol.metadata]?.[_InjectConstants.injectClassOptions] as InjectOptions<TType>[]) ?? [];
-
-      const args = injectOptions.map((options) => this._internalResolve(options, context));
+      const parametersResolveOptions = _ContainerHelper.getParametersResolveOptions(constructor);
+      const args = parametersResolveOptions.map((options) => this._internalResolve(options.token, options.optional, context));
       return new constructor(...args);
     }
 
