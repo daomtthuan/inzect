@@ -17,6 +17,7 @@ export class PackScript extends ScriptBase {
   }
 
   #publish(): void {
+    console.log('> Publishing...');
     ChildProcess.execSync(`pnpm publish`, {
       cwd: this.buildDirPath,
       stdio: 'inherit',

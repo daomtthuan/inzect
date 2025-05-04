@@ -17,6 +17,7 @@ export class PackScript extends ScriptBase {
   }
 
   #pack(): void {
+    console.log('> Packing...');
     ChildProcess.execSync(`pnpm pack --pack-destination "${this.distDir}"`, {
       cwd: this.buildDirPath,
       stdio: 'inherit',

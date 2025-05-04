@@ -14,6 +14,8 @@ export class BuildScript extends ScriptBase {
 
   /** @inheritdoc */
   public run(): void {
+    this.#lint();
+
     this.#cleanBuildDir();
 
     this.#build();
@@ -23,7 +25,16 @@ export class BuildScript extends ScriptBase {
     this.#copyFiles();
   }
 
+  #lint(): void {
+    console.log('> Linting...');
+    ChildProcess.execSync(`tsc --noEmit && eslint ./src --max-warnings 0`, {
+      cwd: this.rootDir,
+      stdio: 'inherit',
+    });
+  }
+
   #cleanBuildDir(): void {
+    console.log('> Cleaning build directory...');
     if (FS.existsSync(this.buildDirPath)) {
       FS.rmSync(this.buildDirPath, { recursive: true, force: true });
     }
@@ -32,6 +43,7 @@ export class BuildScript extends ScriptBase {
   }
 
   #createBuildPackageJson(): void {
+    console.log('> Creating build package.json...');
     const buildPackageJsonPath = Path.join(this.buildDirPath, 'package.json');
 
     FS.writeFileSync(
@@ -61,6 +73,7 @@ export class BuildScript extends ScriptBase {
   }
 
   #build(): void {
+    console.log('> Building...');
     ChildProcess.execSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.buildDirPath}" --strip-leading-paths`, {
       cwd: this.rootDir,
       stdio: 'inherit',
@@ -68,6 +81,7 @@ export class BuildScript extends ScriptBase {
   }
 
   #copyFiles(): void {
+    console.log('> Copying files...');
     ['README.md', 'LICENSE'].forEach((fileName) => {
       const sourcePath = Path.join(this.rootDir, fileName);
       const targetPath = Path.join(this.buildDirPath, fileName);

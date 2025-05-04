@@ -17,6 +17,8 @@ export class ReadmeScript extends ScriptBase {
   }
 
   #build(): void {
+    console.log('> Building README...');
+
     let template = FS.readFileSync(this.#templatePath, 'utf-8');
 
     const exampleMatch = template.matchAll(this.#examplePlaceholderRegex);
