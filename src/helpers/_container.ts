@@ -10,7 +10,7 @@ import { _TypeHelper } from './_type';
  * @internal
  */
 export class _ContainerHelper {
-  static readonly #container = new _Container();
+  static #container?: _Container;
 
   /**
    * Resolve Resolve Options.
@@ -66,6 +66,10 @@ export class _ContainerHelper {
 
   /** @returns Global Dependency Injection Container. */
   public static get globalContainer(): _Container {
+    if (!_ContainerHelper.#container) {
+      _ContainerHelper.#container = new _Container();
+    }
+
     return _ContainerHelper.#container;
   }
 }
