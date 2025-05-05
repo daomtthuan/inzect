@@ -1,5 +1,5 @@
-import type { _InjectTokenOrOptions } from './_decorator';
-import type { Lifecycle } from './_lifecycle';
+import type { Lifecycle } from '~/constants';
+import type { InjectTokenOrOptions } from './_decorator';
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
 import type { InjectionToken } from './_token';
 
@@ -10,13 +10,12 @@ import type { InjectionToken } from './_token';
  * @template TProvider Injection Provider.
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
- * @internal
  */
-type _RegisterOptionsBase<
+type RegisterOptionsBase<
   TType,
   TProvider extends InjectionProvider<TType, TDependencies, TInjects>,
   TDependencies extends unknown[] = never,
-  TInjects extends _InjectTokenOrOptions<unknown>[] = never,
+  TInjects extends InjectTokenOrOptions<unknown>[] = never,
 > = {
   /** Injection Token. */
   token: InjectionToken<TType>;
@@ -37,14 +36,14 @@ type _RegisterOptionsBase<
  *
  * @template TType Type of instance.
  */
-export type ClassRegisterOptions<TType> = _RegisterOptionsBase<TType, ClassInjectionProvider<TType>>;
+export type ClassRegisterOptions<TType> = RegisterOptionsBase<TType, ClassInjectionProvider<TType>>;
 
 /**
  * Value Register Options.
  *
  * @template TType Type of instance.
  */
-export type ValueRegisterOptions<TType> = _RegisterOptionsBase<TType, ValueInjectionProvider<TType>>;
+export type ValueRegisterOptions<TType> = RegisterOptionsBase<TType, ValueInjectionProvider<TType>>;
 
 /**
  * Factory Register Options.
@@ -53,7 +52,7 @@ export type ValueRegisterOptions<TType> = _RegisterOptionsBase<TType, ValueInjec
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type FactoryRegisterOptions<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> = _RegisterOptionsBase<
+export type FactoryRegisterOptions<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> = RegisterOptionsBase<
   TType,
   FactoryInjectionProvider<TType, TDependencies, TInjects>,
   TDependencies,
@@ -67,7 +66,7 @@ export type FactoryRegisterOptions<TType, TDependencies extends unknown[], TInje
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type RegisterOptions<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> =
+export type RegisterOptions<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> =
   | ClassRegisterOptions<TType>
   | ValueRegisterOptions<TType>
   | FactoryRegisterOptions<TType, TDependencies, TInjects>;
@@ -76,9 +75,8 @@ export type RegisterOptions<TType, TDependencies extends unknown[], TInjects ext
  * Resolve Options Base.
  *
  * @template TType Type of instance.
- * @internal
  */
-type _ResolveOptionsBase<TType> = {
+type ResolveOptionsBase<TType> = {
   /** Injection Token. */
   token: InjectionToken<TType>;
 };
@@ -88,7 +86,7 @@ type _ResolveOptionsBase<TType> = {
  *
  * @template TType Type of instance.
  */
-export type RequiredResolveOptions<TType> = _ResolveOptionsBase<TType> & {
+export type RequiredResolveOptions<TType> = ResolveOptionsBase<TType> & {
   /**
    * `true` if the resolution is optional, `false` otherwise.
    *
@@ -102,7 +100,7 @@ export type RequiredResolveOptions<TType> = _ResolveOptionsBase<TType> & {
  *
  * @template TType Type of instance.
  */
-export type OptionalResolveOptions<TType> = _ResolveOptionsBase<TType> & {
+export type OptionalResolveOptions<TType> = ResolveOptionsBase<TType> & {
   /** `true` if the resolution is optional, `false` otherwise. */
   optional: true;
 };
@@ -114,24 +112,10 @@ export type OptionalResolveOptions<TType> = _ResolveOptionsBase<TType> & {
  */
 export type ResolveOptions<TType> = RequiredResolveOptions<TType> | OptionalResolveOptions<TType>;
 
-/**
- * Internal Resolve Options.
- *
- * @template TType Type of instance.
- * @internal
- */
-export type _InternalResolveOptions<TType> = {
-  /** Injection Token. */
-  token: InjectionToken<TType>;
-
-  /** `true` if the resolution is optional, `false` otherwise. */
-  optional: boolean;
-};
-
 /** Dependency Injection Container Interface. */
 export interface IDependencyInjectionContainer {
   /**
-   * Registers a dependency with {@link ClassInjectionProvider}
+   * Register a dependency with {@link ClassInjectionProvider}
    *
    * @overload
    * @template TType Type of instance to register.
@@ -139,7 +123,7 @@ export interface IDependencyInjectionContainer {
    */
   register<TType>(options: ClassRegisterOptions<TType>): void;
   /**
-   * Registers a dependency with {@link ValueInjectionProvider}
+   * Register a dependency with {@link ValueInjectionProvider}
    *
    * @overload
    * @template TType Type of instance to register.
@@ -147,7 +131,7 @@ export interface IDependencyInjectionContainer {
    */
   register<TType>(options: ValueRegisterOptions<TType>): void;
   /**
-   * Registers a dependency with {@link FactoryInjectionProvider}
+   * Register a dependency with {@link FactoryInjectionProvider}
    *
    * @overload
    * @template TType Type of instance to register.
@@ -155,41 +139,17 @@ export interface IDependencyInjectionContainer {
    * @template TInjects Inject types.
    * @param options Factory Register Options.
    */
-  register<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
+  register<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: FactoryRegisterOptions<TType, TDependencies, TInjects>,
   ): void;
 
   /**
-   * Resolves a dependency.
+   * Unregister a dependency.
    *
-   * @overload
-   * @template TType Type of instance to resolve.
+   * @template TType Type of instance to unregister.
    * @param token Injection Token.
-   *
-   * @returns Resolved instance.
    */
-  resolve<TType>(token: InjectionToken<TType>): TType;
-  /**
-   * Resolves a dependency.
-   *
-   * @overload
-   * @template TType Type of instance to resolve.
-   * @param options Resolve Options.
-   *
-   * @returns Resolved instance.
-   */
-  resolve<TType>(options: RequiredResolveOptions<TType>): TType;
-  /**
-   * Optional Resolves a dependency.\
-   * Returns `undefined` if the token is not registered.
-   *
-   * @overload
-   * @template TType Type of instance to resolve.
-   * @param options Optional Resolve Options.
-   *
-   * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
-   */
-  resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
+  unregister<TType>(token: InjectionToken<TType>): void;
 
   /**
    * Check if the container has a registration for the token.
@@ -200,6 +160,38 @@ export interface IDependencyInjectionContainer {
    */
   isRegistered<TType>(token: InjectionToken<TType>): boolean;
 
-  /** Clears all registered dependencies. */
+  /** Clear all registered dependencies. */
   clear(): void;
+
+  /**
+   * Resolve a dependency.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
+   * @param token Injection Token.
+   *
+   * @returns Resolved instance.
+   */
+  resolve<TType>(token: InjectionToken<TType>): TType;
+  /**
+   * Resolve a dependency.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
+   * @param options Resolve Options.
+   *
+   * @returns Resolved instance.
+   */
+  resolve<TType>(options: RequiredResolveOptions<TType>): TType;
+  /**
+   * Optional Resolves a dependency.\
+   * Return `undefined` if the token is not registered.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
+   * @param options Optional Resolve Options.
+   *
+   * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
+   */
+  resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
 }

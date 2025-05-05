@@ -1,5 +1,5 @@
 import type { Primitive } from 'type-fest';
-import type { _ClassType } from './_type';
+import type { ClassType } from './_type';
 
 /** Primitive Injection Token. */
 export type PrimitiveInjectionToken = NonNullable<Primitive>;
@@ -9,7 +9,7 @@ export type PrimitiveInjectionToken = NonNullable<Primitive>;
  *
  * @template TType Type of instance.
  */
-export type ClassInjectionToken<TType> = _ClassType<TType>;
+export type ClassInjectionToken<TType> = ClassType<TType>;
 
 /**
  * Dependency Injection Token.
@@ -25,12 +25,8 @@ export type InjectionToken<TType> = PrimitiveInjectionToken | ClassInjectionToke
  */
 export type InjectTokenFactory<TType> = () => InjectionToken<TType>;
 
-/**
- * Primitive Injection Token Map Key.
- *
- * @internal
- */
-export type _PrimitiveInjectionTokenMapKey = {
+/** Primitive Injection Token Map Key. */
+export type PrimitiveInjectionTokenMapKey = {
   /** Token value. */
   value: PrimitiveInjectionToken;
 };
@@ -39,6 +35,5 @@ export type _PrimitiveInjectionTokenMapKey = {
  * Injection Token Map Key.
  *
  * @template TType Type of instance.
- * @internal
  */
-export type _InjectionTokenMapKey<TType> = _PrimitiveInjectionTokenMapKey | ClassInjectionToken<TType>;
+export type InjectionTokenMapKey<TType> = PrimitiveInjectionTokenMapKey | ClassInjectionToken<TType>;

@@ -1,23 +1,87 @@
-/** Injection Lifecycle Type. */
-export enum Lifecycle {
+import type { IResolutionContext } from './_context';
+import type { InjectTokenOrOptions } from './_decorator';
+import type { Registration } from './_registration';
+import type { InjectionToken } from './_token';
+
+/**
+ * Lifecycle Strategy Instance Options Base.
+ *
+ * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
+ */
+type LifecycleStrategyInstanceOptionsBase<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> = {
+  /** Injection token. */
+  token: InjectionToken<TType>;
+
+  /** Registration. */
+  registration: Registration<TType, TDependencies, TInjects>;
+
+  /** Resolution context. */
+  context: IResolutionContext;
+};
+
+/**
+ * Resolution Lifecycle Strategy Store Instance Options.
+ *
+ * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
+ */
+export type LifecycleStrategyStoreInstanceOptions<
+  TType,
+  TDependencies extends unknown[],
+  TInjects extends InjectTokenOrOptions<unknown>[],
+> = LifecycleStrategyInstanceOptionsBase<TType, TDependencies, TInjects> & {
+  /** Instance. */
+  instance: TType | undefined;
+};
+
+/**
+ * Lifecycle Strategy Resolve Instance Options.
+ *
+ * @template TType Type of instance.
+ * @template TDependencies Dependencies types.
+ * @template TInjects Inject types.
+ */
+export type LifecycleStrategyResolveInstanceOptions<
+  TType,
+  TDependencies extends unknown[],
+  TInjects extends InjectTokenOrOptions<unknown>[],
+> = LifecycleStrategyInstanceOptionsBase<TType, TDependencies, TInjects>;
+
+/**
+ * Lifecycle Strategy Resolve Instance Return.
+ *
+ * @template TType Type of instance.
+ */
+export type LifecycleStrategyResolveInstanceReturn<TType> = [isResolved: false] | [isResolved: true, instance: TType | undefined];
+
+/** Lifecycle Strategy Interface. */
+export interface ILifecycleStrategy {
   /**
-   * Singleton scope.
+   * Store instance.
    *
-   * Always resolves to the same single instance throughout the entire lifetime of the container.
+   * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
+   * @param options Lifecycle Strategy Store Instance Options.
    */
-  Singleton,
+  storeInstance<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
+    options: LifecycleStrategyStoreInstanceOptions<TType, TDependencies, TInjects>,
+  ): void;
 
   /**
-   * Transient scope.
+   * Resolve instance.
    *
-   * Creates a new instance every time the dependency is resolved.
-   */
-  Transient,
-
-  /**
-   * Resolution scope.
+   * @template TType Type of instance.
+   * @template TDependencies Dependencies types.
+   * @template TInjects Inject types.
+   * @param options Lifecycle Strategy Resolve Instance Options.
    *
-   * Resolves the same instance only within the same resolution context.
+   * @returns Resolved Instance return.
    */
-  Resolution,
+  resolveInstance<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
+    options: LifecycleStrategyResolveInstanceOptions<TType, TDependencies, TInjects>,
+  ): LifecycleStrategyResolveInstanceReturn<TType>;
 }

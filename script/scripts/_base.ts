@@ -36,19 +36,13 @@ export abstract class ScriptBase {
 
   /** @returns Package.json. */
   protected get packageJson(): PackageJson {
-    if (!this.#packageJson) {
-      this.#packageJson = this.#getPackageJson(this.#packageJsonPath);
-    }
-
+    this.#packageJson ??= this.#getPackageJson(this.#packageJsonPath);
     return this.#packageJson;
   }
 
   /** @returns Build directory path. */
   protected get buildDirPath(): string {
-    if (!this.#buildDirPath) {
-      this.#buildDirPath = this.#getBuildDirPath(this.packageJson);
-    }
-
+    this.#buildDirPath ??= this.#getBuildDirPath(this.packageJson);
     return this.#buildDirPath;
   }
 

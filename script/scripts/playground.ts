@@ -1,6 +1,6 @@
 import ChildProcess from 'child_process';
+import { Lifecycle } from '~/constants';
 import { Scope } from '~/decorators';
-import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
 
 /** Playground script. */

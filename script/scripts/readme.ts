@@ -1,7 +1,7 @@
 import FS from 'fs';
 import Path from 'path';
+import { Lifecycle } from '~/constants';
 import { Scope } from '~/decorators';
-import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
 
 /** Readme script. */
@@ -33,11 +33,7 @@ export class ReadmeScript extends ScriptBase {
         .split('\n')
         .map((line) => {
           const addedSpace = `${space}${line}`;
-          if (!addedSpace.trim()) {
-            return '';
-          }
-
-          return addedSpace;
+          return !addedSpace.trim() ? '' : addedSpace;
         })
         .join('\n');
       template = template.replace(match, fileContent);

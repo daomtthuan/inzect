@@ -1,13 +1,9 @@
-import type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from '~/types';
+import type { ClassDecorator, ClassFieldDecorator, ClassType } from '~/types';
 
-import { _TypeHelper } from './_type';
+import { TypeHelper } from './_type';
 
-/**
- * Helper for Decorator.
- *
- * @internal
- */
-export class _DecoratorHelper {
+/** Helper for Decorator. */
+export class DecoratorHelper {
   /**
    * Check if the arguments are valid for a class decorator.
    *
@@ -17,12 +13,12 @@ export class _DecoratorHelper {
    *
    * @returns `true` if the arguments are valid for a class decorator, `false` otherwise.
    */
-  public static isClassDecoratorParameters<TTarget extends _ClassType, TDecorate extends _ClassType>(
+  public static isClassDecoratorParameters<TTarget extends ClassType<unknown>, TDecorate extends ClassType<unknown>>(
     args: [target: TTarget | undefined, context: DecoratorContext],
-  ): args is Parameters<_ClassDecorator<TTarget, TDecorate>> {
+  ): args is Parameters<ClassDecorator<TTarget, TDecorate>> {
     const [target, context] = args;
 
-    return _TypeHelper.isClass(target) && context.kind === 'class';
+    return TypeHelper.isClass(target) && context.kind === 'class';
   }
 
   /**
@@ -36,7 +32,7 @@ export class _DecoratorHelper {
    */
   public static isClassFieldDecoratorParameters<TValue, TTransform = TValue>(
     args: [_: unknown, context: DecoratorContext],
-  ): args is Parameters<_ClassFieldDecorator<TValue, TTransform>> {
+  ): args is Parameters<ClassFieldDecorator<TValue, TTransform>> {
     const [_, context] = args;
 
     return context.kind === 'field';

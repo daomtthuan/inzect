@@ -1,12 +1,7 @@
 import type { Class, Primitive } from 'type-fest';
-import type { _ClassType } from '~/types';
 
-/**
- * Helper for Type.
- *
- * @internal
- */
-export class _TypeHelper {
+/** Helper for Type. */
+export class TypeHelper {
   static readonly #primitiveTypes = ['string', 'number', 'boolean', 'symbol', 'bigint'];
 
   /**
@@ -28,7 +23,7 @@ export class _TypeHelper {
    * @returns `true` if the value is primitive, `false` otherwise.
    */
   public static isPrimitive(value: unknown): value is Primitive {
-    return _TypeHelper.isNullish(value) || this.#primitiveTypes.includes(typeof value);
+    return TypeHelper.isNullish(value) || this.#primitiveTypes.includes(typeof value);
   }
 
   /**
@@ -53,6 +48,6 @@ export class _TypeHelper {
    * @returns `true` if the value is function, `false` otherwise.
    */
   public static isFunction<TParams extends unknown[], TReturn>(value: unknown): value is (...args: TParams) => TReturn {
-    return typeof value === 'function' && !_TypeHelper.isClass(value);
+    return typeof value === 'function' && !TypeHelper.isClass(value);
   }
 }

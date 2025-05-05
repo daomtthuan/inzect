@@ -1,5 +1,5 @@
-import type { _InjectTokenOrOptions } from './_decorator';
-import type { _ClassType } from './_type';
+import type { Class } from 'type-fest';
+import type { InjectTokenOrOptions } from './_decorator';
 
 /**
  * Class Injection Provider.
@@ -7,8 +7,8 @@ import type { _ClassType } from './_type';
  * @template TType Type of instance.
  */
 export type ClassInjectionProvider<TType> = {
-  /** Provides a class. */
-  useClass: _ClassType<TType>;
+  /** Provide a class. */
+  useClass: Class<TType>;
 };
 
 /**
@@ -17,7 +17,7 @@ export type ClassInjectionProvider<TType> = {
  * @template TType Type of instance.
  */
 export type ValueInjectionProvider<TType> = {
-  /** Provides a value. */
+  /** Provide a value. */
   useValue: TType;
 };
 
@@ -28,12 +28,12 @@ export type ValueInjectionProvider<TType> = {
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> = {
-  /** Injects dependencies. */
+export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> = {
+  /** Inject dependencies. */
   inject?: TInjects;
 
   /**
-   * Provides a factory.
+   * Provide a factory.
    *
    * @param container Dependency Injection Container.
    *
@@ -49,7 +49,7 @@ export type FactoryInjectionProvider<TType, TDependencies extends unknown[], TIn
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type InjectionProvider<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> =
+export type InjectionProvider<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> =
   | ClassInjectionProvider<TType>
   | ValueInjectionProvider<TType>
   | FactoryInjectionProvider<TType, TDependencies, TInjects>;

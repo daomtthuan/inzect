@@ -1,36 +1,11 @@
-export type {
-  _InternalResolveOptions,
-  ClassRegisterOptions,
-  FactoryRegisterOptions,
-  IDependencyInjectionContainer,
-  OptionalResolveOptions,
-  RegisterOptions,
-  RequiredResolveOptions,
-  ResolveOptions,
-  ValueRegisterOptions,
-} from './_container';
-export type {
-  _InjectParameter,
-  _InjectReturn,
-  _InjectTokenOrOptions,
-  InjectableOptions,
-  InjectOptions,
-  OptionalInjectOptions,
-  RequiredInjectOptions,
-} from './_decorator';
-export type { ArgumentErrorOptions, RegistrationErrorOptions, ResolutionErrorOptions } from './_error';
-export type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
-export type { Registration } from './_registration';
-export type { IDependencyInjectionRegistry } from './_registry';
-export type { IResolutionContext } from './_resolution';
-export type {
-  _InjectionTokenMapKey,
-  _PrimitiveInjectionTokenMapKey,
-  ClassInjectionToken,
-  InjectionToken,
-  InjectTokenFactory,
-  PrimitiveInjectionToken,
-} from './_token';
-export type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
-
-export { Lifecycle } from './_lifecycle';
+export type * from './_container';
+export type * from './_context';
+export type * from './_decorator';
+export type * from './_error';
+export type * from './_lifecycle';
+export type * from './_provider';
+export type * from './_registration';
+export type * from './_registry';
+export type * from './_resolver';
+export type * from './_token';
+export type * from './_type';

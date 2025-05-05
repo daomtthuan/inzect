@@ -1,8 +1,8 @@
-import type { _ClassDecorator, _ClassType, Lifecycle } from '~/types';
+import type { Class } from 'type-fest';
+import type { Lifecycle } from '~/constants';
+import type { ClassDecorator } from '~/types';
 
-import { _Container } from '~/container';
-import { _ResolutionContext } from '~/container/_resolution-context';
-import { _InjectionTokenHelper } from '~/helpers';
+import { Container } from '~/container';
 
 /**
  * Decorator factory to mark a class as injectable with scope.
@@ -13,11 +13,13 @@ import { _InjectionTokenHelper } from '~/helpers';
  *
  * @returns TTarget decorator.
  */
-export function Scope<TTarget extends _ClassType>(scope: Lifecycle): _ClassDecorator<TTarget> {
+export function Scope<TTarget extends Class<unknown>>(scope: Lifecycle): ClassDecorator<TTarget> {
   return (target) => {
-    _Container.instance.register({
+    Container.instance.register({
       token: target,
-      provider: { useClass: target },
+      provider: {
+        useClass: target,
+      },
       scope,
     });
   };

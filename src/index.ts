@@ -2,11 +2,11 @@ import 'polyfill-symbol-metadata';
 
 import type { IDependencyInjectionContainer } from './types';
 
-import { _Container } from './container';
+import { Container } from './container';
 
 /** Global Dependency Injection Container. */
-export const container: IDependencyInjectionContainer = _Container.instance;
+export const container: IDependencyInjectionContainer = Container.instance;
 
-export * from './types';
-export * from './decorators';
-export * from './errors';
+export { Lifecycle } from './constants';
+export { Inject, Injectable, Scope } from './decorators';
+export { ArgumentError, RegistrationError, ResolutionError } from './errors';

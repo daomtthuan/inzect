@@ -1,6 +1,7 @@
-import type { Lifecycle } from './_lifecycle';
+import type { Class } from 'type-fest';
+import type { Lifecycle } from '~/constants';
 import type { InjectionToken, InjectTokenFactory } from './_token';
-import type { _ClassDecorator, _ClassFieldDecorator, _ClassType } from './_type';
+import type { ClassDecorator, ClassFieldDecorator } from './_type';
 
 /**
  * Injectable Options.
@@ -26,9 +27,8 @@ export type InjectableOptions<TType> = {
  * Inject Options Base.
  *
  * @template TType Type of instance.
- * @internal
  */
-type _InjectOptionsBase<TType> = {
+type InjectOptionsBase<TType> = {
   /** Injection Token. */
   token: InjectionToken<TType> | InjectTokenFactory<TType>;
 };
@@ -38,7 +38,7 @@ type _InjectOptionsBase<TType> = {
  *
  * @template TType Type of instance.
  */
-export type RequiredInjectOptions<TType> = _InjectOptionsBase<TType> & {
+export type RequiredInjectOptions<TType> = InjectOptionsBase<TType> & {
   /**
    * If set to `true`, inject `undefined` if token is not registered.
    *
@@ -52,7 +52,7 @@ export type RequiredInjectOptions<TType> = _InjectOptionsBase<TType> & {
  *
  * @template TType Type of instance.
  */
-export type OptionalInjectOptions<TType> = _InjectOptionsBase<TType> & {
+export type OptionalInjectOptions<TType> = InjectOptionsBase<TType> & {
   /** If set to `true`, inject `undefined` if token is not registered. */
   optional: true;
 };
@@ -68,31 +68,27 @@ export type InjectOptions<TType> = RequiredInjectOptions<TType> | OptionalInject
  * Injection Token or Inject Options.
  *
  * @template TType Type of instance.
- * @internal
  */
-export type _InjectTokenOrOptions<TType> = InjectionToken<TType> | InjectOptions<TType>;
+export type InjectTokenOrOptions<TType> = InjectionToken<TType> | InjectOptions<TType>;
 
 /**
  * Inject Constructor Parameter Options.
  *
  * @template TType Type of instance.
- * @internal
  */
-export type _InjectConstructorParameterOptions<TType> = (_InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[];
+export type InjectConstructorParameterOptions<TType> = (InjectTokenOrOptions<TType> | InjectTokenFactory<TType>)[];
 
 /**
  * Inject Parameter.
  *
  * @template TType Type of instance.
- * @internal
  */
-export type _InjectParameter<TType> = _InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | _InjectConstructorParameterOptions<TType>;
+export type InjectParameter<TType> = InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | InjectConstructorParameterOptions<TType>;
 
 /**
  * Inject Return.
  *
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @internal
  */
-export type _InjectReturn<TTarget extends _ClassType, TType> = _ClassDecorator<TTarget> | _ClassFieldDecorator<TType, TType | undefined>;
+export type InjectReturn<TTarget extends Class<unknown>, TType> = ClassDecorator<TTarget> | ClassFieldDecorator<TType, TType | undefined>;

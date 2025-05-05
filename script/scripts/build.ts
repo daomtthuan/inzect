@@ -1,8 +1,8 @@
 import ChildProcess from 'child_process';
 import FS from 'fs';
 import Path from 'path';
+import { Lifecycle } from '~/constants';
 import { Inject, Scope } from '~/decorators';
-import { Lifecycle } from '~/types';
 import { ScriptBase } from './_base';
 import ReadmeScript from './readme';
 
@@ -62,6 +62,7 @@ export class BuildScript extends ScriptBase {
           main: './index.js',
           exports: {
             '.': './index.js',
+            './*': './*/index.js',
           },
           dependencies: this.packageJson.dependencies,
           keywords: this.packageJson.keywords,

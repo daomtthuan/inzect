@@ -1,13 +1,9 @@
-import type { _InjectTokenOrOptions } from './_decorator';
+import type { InjectTokenOrOptions } from './_decorator';
 import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
-/**
- * Error Options Base.
- *
- * @internal
- */
-type _ErrorOptionsBase = {
+/** Error Options Base. */
+type ErrorOptionsBase = {
   /** Error cause. */
   cause?: object;
 
@@ -22,7 +18,7 @@ type _ErrorOptionsBase = {
  * @template TDependencies Dependencies types.
  * @template TInjects Inject types.
  */
-export type RegistrationErrorOptions<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]> = _ErrorOptionsBase & {
+export type RegistrationErrorOptions<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> = ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
 
@@ -35,7 +31,7 @@ export type RegistrationErrorOptions<TType, TDependencies extends unknown[], TIn
  *
  * @template TType Type of instance.
  */
-export type ResolutionErrorOptions<TType> = _ErrorOptionsBase & {
+export type ResolutionErrorOptions<TType> = ErrorOptionsBase & {
   /** Injection token. */
   token: InjectionToken<TType>;
 };
@@ -45,7 +41,7 @@ export type ResolutionErrorOptions<TType> = _ErrorOptionsBase & {
  *
  * @template TArgument Argument type.
  */
-export type ArgumentErrorOptions<TArgument> = _ErrorOptionsBase & {
+export type ArgumentErrorOptions<TArgument> = ErrorOptionsBase & {
   /** Argument. */
   argument: TArgument;
 };

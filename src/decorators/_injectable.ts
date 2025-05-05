@@ -1,9 +1,9 @@
-import type { _ClassDecorator, _ClassType, InjectableOptions, InjectionToken } from '~/types';
+import type { Class } from 'type-fest';
+import type { ClassDecorator, InjectableOptions, InjectionToken } from '~/types';
 
-import { _Container } from '~/container';
-import { _ResolutionContext } from '~/container/_resolution-context';
-import { _InjectionTokenHelper } from '~/helpers';
-import { Lifecycle } from '~/types';
+import { Lifecycle } from '~/constants';
+import { Container } from '~/container';
+import { TokenHelper } from '~/helpers';
 
 /**
  * Decorator factory to mark a class as injectable.
@@ -14,7 +14,7 @@ import { Lifecycle } from '~/types';
  *
  * @returns Injectable decorator.
  */
-export function Injectable<TTarget extends _ClassType, TType>(token?: InjectionToken<TType>): _ClassDecorator<TTarget>;
+export function Injectable<TTarget extends Class<unknown>, TType>(token?: InjectionToken<TType>): ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class as injectable.
  *
@@ -24,7 +24,7 @@ export function Injectable<TTarget extends _ClassType, TType>(token?: InjectionT
  *
  * @returns Injectable decorator.
  */
-export function Injectable<TTarget extends _ClassType, TType>(options: InjectableOptions<TType>): _ClassDecorator<TTarget>;
+export function Injectable<TTarget extends Class<unknown>, TType>(options: InjectableOptions<TType>): ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class as injectable.
  *
@@ -34,11 +34,11 @@ export function Injectable<TTarget extends _ClassType, TType>(options: Injectabl
  *
  * @returns Injectable decorator.
  */
-export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: InjectionToken<TType> | InjectableOptions<TType>): _ClassDecorator<TTarget> {
+export function Injectable<TTarget extends Class<unknown>, TType>(tokenOrOptions?: InjectionToken<TType> | InjectableOptions<TType>): ClassDecorator<TTarget> {
   const options = tokenOrOptions ? resolveInjectableOptions(tokenOrOptions) : undefined;
 
   return (target) => {
-    _Container.instance.register({
+    Container.instance.register({
       token: options?.token ?? target,
       provider: {
         useClass: target,
@@ -57,7 +57,7 @@ export function Injectable<TTarget extends _ClassType, TType>(tokenOrOptions?: I
  * @returns Resolved Injectable Options.
  */
 function resolveInjectableOptions<TType>(tokenOrOptions: InjectionToken<TType> | InjectableOptions<TType>): InjectableOptions<TType> {
-  if (_InjectionTokenHelper.isPrimitiveInjectionToken(tokenOrOptions) || _InjectionTokenHelper.isClassInjectionToken(tokenOrOptions)) {
+  if (TokenHelper.isPrimitiveInjectionToken(tokenOrOptions) || TokenHelper.isClassInjectionToken(tokenOrOptions)) {
     return {
       token: tokenOrOptions,
       scope: Lifecycle.Transient,

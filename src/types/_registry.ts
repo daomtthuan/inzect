@@ -1,4 +1,4 @@
-import type { _InjectTokenOrOptions } from './_decorator';
+import type { InjectTokenOrOptions } from './_decorator';
 import type { Registration } from './_registration';
 import type { InjectionToken } from './_token';
 
@@ -13,7 +13,7 @@ export interface IDependencyInjectionRegistry {
    * @param token Injection token.
    * @param registration Registration.
    */
-  set<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
+  set<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
   ): void;
@@ -28,7 +28,7 @@ export interface IDependencyInjectionRegistry {
    *
    * @returns Registrations.
    */
-  get<TType, TDependencies extends unknown[], TInjects extends _InjectTokenOrOptions<unknown>[]>(
+  get<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjects> | null;
 
@@ -41,6 +41,14 @@ export interface IDependencyInjectionRegistry {
    * @returns `true` if the registry has a registration for the token, `false` otherwise.
    */
   has<TType>(token: InjectionToken<TType>): boolean;
+
+  /**
+   * Delete registration.
+   *
+   * @template TType Type of instance.
+   * @param token Injection token.
+   */
+  delete<TType>(token: InjectionToken<TType>): void;
 
   /** Clear the registry. */
   clear(): void;
