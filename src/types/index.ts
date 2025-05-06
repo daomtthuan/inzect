@@ -2,7 +2,6 @@ export type * from './_container';
 export type * from './_context';
 export type * from './_decorator';
 export type * from './_error';
-export type * from './_lifecycle';
 export type * from './_provider';
 export type * from './_registration';
 export type * from './_registry';

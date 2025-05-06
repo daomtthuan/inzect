@@ -6,11 +6,12 @@ import type {
   InjectionToken,
   InjectTokenFactory,
   InjectTokenOrOptions,
+  LifecycleResolverOptions,
+  NormalizeResolveOptions,
   OptionalResolveOptions,
   RegisterOptions,
   Registration,
   RequiredResolveOptions,
-  ResolveInstanceOptions,
   ResolveOptions,
   ValueRegisterOptions,
 } from '~/types';
@@ -41,9 +42,7 @@ export class Container implements IDependencyInjectionContainer {
   public register<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: RegisterOptions<TType, TDependencies, TInjects>,
   ): void {
-    const token = options.token;
-
-    this.#registry.set(token, {
+    this.#registry.set(options.token, {
       provider: options.provider,
       scope: options.scope ?? Lifecycle.Transient,
     });
@@ -88,19 +87,17 @@ export class Container implements IDependencyInjectionContainer {
    * @returns Instance.
    */
   public resolveInstance<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): TType | undefined {
-    const options = this.#normalizeResolveInstanceOptions(arg);
-    const token = options.token;
-    const optional = options.optional;
+    const options = this.#normalizeResolveOptions(arg);
 
-    const registration = this.#registry.get(token);
+    const registration = this.#registry.get(options.token);
     if (!registration) {
-      return this.#resolveUnregisteredRegistration(token, optional);
+      return this.#resolveUnregisteredRegistration(options.token, options.optional);
     }
 
-    return this.#resolveRegistration(token, registration);
+    return this.#resolveRegistration(options.token, registration);
   }
 
-  #normalizeResolveInstanceOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): ResolveInstanceOptions<TType> {
+  #normalizeResolveOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): NormalizeResolveOptions<TType> {
     if (typeof arg === 'object' && 'token' in arg) {
       const token = TypeHelper.isFunction(arg.token) ? arg.token() : arg.token;
 
@@ -146,24 +143,21 @@ export class Container implements IDependencyInjectionContainer {
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
   ): TType | undefined {
-    const lifecycleResolver = LifecycleResolverStrategyFactory.get(registration.scope);
-    const result = lifecycleResolver.resolve({
+    const options: LifecycleResolverOptions<TType, TDependencies, TInjects> = {
       token,
       registration,
       context: this.#internalResolutionContext,
-    });
+    };
+
+    const lifecycleResolver = LifecycleResolverStrategyFactory.get(registration.scope);
+    const result = lifecycleResolver.resolve(options);
     if (result.isResolved) {
       return result.instance;
     }
 
     const providerResolver = ProviderResolverStrategyFactory.get(registration.provider);
     const instance = providerResolver.resolve(this, registration.provider);
-    lifecycleResolver.store({
-      token,
-      registration,
-      context: this.#internalResolutionContext,
-      instance,
-    });
+    lifecycleResolver.store(instance, options);
 
     return instance;
   }

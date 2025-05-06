@@ -1,3 +1,4 @@
+import type { SetNonNullable } from 'type-fest';
 import type { Lifecycle } from '~/constants';
 import type { InjectTokenOrOptions } from './_decorator';
 import type { ClassInjectionProvider, FactoryInjectionProvider, InjectionProvider, ValueInjectionProvider } from './_provider';
@@ -111,6 +112,13 @@ export type OptionalResolveOptions<TType> = ResolveOptionsBase<TType> & {
  * @template TType Type of instance.
  */
 export type ResolveOptions<TType> = RequiredResolveOptions<TType> | OptionalResolveOptions<TType>;
+
+/**
+ * Normalize Resolve Options.
+ *
+ * @template TType Type of instance.
+ */
+export type NormalizeResolveOptions<TType> = Required<SetNonNullable<ResolveOptions<TType>>>;
 
 /** Dependency Injection Container Interface. */
 export interface IDependencyInjectionContainer {

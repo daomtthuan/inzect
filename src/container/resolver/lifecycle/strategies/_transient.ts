@@ -1,4 +1,4 @@
-import type { ILifecycleResolverStrategy, LifecycleStrategyResolveInstanceReturn } from '~/types';
+import type { ILifecycleResolverStrategy, LifecycleResolverResolveReturn } from '~/types';
 
 /** Transient Lifecycle Resolver Strategy. */
 export class TransientLifecycleResolverStrategy implements ILifecycleResolverStrategy {
@@ -8,7 +8,7 @@ export class TransientLifecycleResolverStrategy implements ILifecycleResolverStr
   }
 
   /** @inheritdoc */
-  public resolve<TType>(): LifecycleStrategyResolveInstanceReturn<TType> {
+  public resolve<TType>(): LifecycleResolverResolveReturn<TType> {
     return {
       isResolved: false,
     };
