@@ -55,10 +55,21 @@ export type LifecycleStrategyResolveInstanceOptions<
  *
  * @template TType Type of instance.
  */
-export type LifecycleStrategyResolveInstanceReturn<TType> = [isResolved: false] | [isResolved: true, instance: TType | undefined];
+export type LifecycleStrategyResolveInstanceReturn<TType> =
+  | {
+      /** Is resolved. */
+      isResolved: false;
+    }
+  | {
+      /** Is resolved. */
+      isResolved: true;
+
+      /** Instance. */
+      instance: TType | undefined;
+    };
 
 /** Lifecycle Strategy Interface. */
-export interface ILifecycleStrategy {
+export interface ILifecycleResolverStrategy {
   /**
    * Store instance.
    *

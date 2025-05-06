@@ -19,9 +19,9 @@ import { Lifecycle } from '~/constants';
 import { ResolutionError } from '~/errors';
 import { TokenHelper, TypeHelper } from '~/helpers';
 import { ResolutionContext } from './context/_resolution-context';
-import { LifecycleStrategyFactory } from './lifecycle/_factory';
 import { Registry } from './registry/_registry';
-import { ResolverStrategyFactory } from './resolver/_factory';
+import { LifecycleResolverStrategyFactory } from './resolver/lifecycle/_factory';
+import { ProviderResolverStrategyFactory } from './resolver/provider/_factory';
 
 /** Dependency Injection Container. */
 export class Container implements IDependencyInjectionContainer {
@@ -88,28 +88,19 @@ export class Container implements IDependencyInjectionContainer {
    * @returns Instance.
    */
   public resolveInstance<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): TType | undefined {
-    const options = this.#normalizeResolveOptions(arg);
+    const options = this.#normalizeResolveInstanceOptions(arg);
     const token = options.token;
+    const optional = options.optional;
 
     const registration = this.#registry.get(token);
     if (!registration) {
-      return this.#resolveUnregisteredRegistration(options);
-    }
-
-    const lifecycle = LifecycleStrategyFactory.get(registration.scope);
-    const [isResolved, instance] = lifecycle.resolve({
-      token,
-      registration,
-      context: this.#internalResolutionContext,
-    });
-    if (isResolved) {
-      return instance;
+      return this.#resolveUnregisteredRegistration(token, optional);
     }
 
     return this.#resolveRegistration(token, registration);
   }
 
-  #normalizeResolveOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): ResolveInstanceOptions<TType> {
+  #normalizeResolveInstanceOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): ResolveInstanceOptions<TType> {
     if (typeof arg === 'object' && 'token' in arg) {
       const token = TypeHelper.isFunction(arg.token) ? arg.token() : arg.token;
 
@@ -126,10 +117,7 @@ export class Container implements IDependencyInjectionContainer {
     };
   }
 
-  #resolveUnregisteredRegistration<TType>(options: ResolveInstanceOptions<TType>): TType | undefined {
-    const token = options.token;
-    const optional = options.optional;
-
+  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean): TType | undefined {
     if (TokenHelper.isPrimitiveInjectionToken(token)) {
       if (optional) {
         return undefined;
@@ -144,8 +132,8 @@ export class Container implements IDependencyInjectionContainer {
     // No registration found with this token. But the token is a class, try to construct an instance.
     if (TypeHelper.isClass(token)) {
       const provider: ClassInjectionProvider<TType> = { useClass: token };
-      const resolver = ResolverStrategyFactory.get(provider);
-      return resolver.resolve(this, provider);
+      const providerResolver = ProviderResolverStrategyFactory.get(provider);
+      return providerResolver.resolve(this, provider);
     }
 
     throw new ResolutionError({
@@ -157,15 +145,20 @@ export class Container implements IDependencyInjectionContainer {
   #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjects>,
-  ): TType {
-    const provider = registration.provider;
-    const scope = registration.scope;
+  ): TType | undefined {
+    const lifecycleResolver = LifecycleResolverStrategyFactory.get(registration.scope);
+    const result = lifecycleResolver.resolve({
+      token,
+      registration,
+      context: this.#internalResolutionContext,
+    });
+    if (result.isResolved) {
+      return result.instance;
+    }
 
-    const resolver = ResolverStrategyFactory.get(provider);
-    const instance = resolver.resolve(this, provider);
-
-    const lifecycle = LifecycleStrategyFactory.get(scope);
-    lifecycle.store({
+    const providerResolver = ProviderResolverStrategyFactory.get(registration.provider);
+    const instance = providerResolver.resolve(this, registration.provider);
+    lifecycleResolver.store({
       token,
       registration,
       context: this.#internalResolutionContext,

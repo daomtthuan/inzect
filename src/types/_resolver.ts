@@ -3,8 +3,8 @@ import type { InjectTokenOrOptions } from './_decorator';
 import type { InjectionProvider } from './_provider';
 import type { InjectionToken } from './_token';
 
-/** Resolver Strategy. */
-export interface IResolverStrategy {
+/** Provider Resolver Strategy Factory Interface. */
+export interface IProviderResolverStrategy {
   /**
    * Resolve instance.
    *

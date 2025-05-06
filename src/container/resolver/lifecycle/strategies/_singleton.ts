@@ -1,28 +1,35 @@
 import type {
-  ILifecycleStrategy,
+  ILifecycleResolverStrategy,
   InjectTokenOrOptions,
   LifecycleStrategyResolveInstanceOptions,
   LifecycleStrategyResolveInstanceReturn,
   LifecycleStrategyStoreInstanceOptions,
 } from '~/types';
 
-/** Resolution Lifecycle Strategy. */
-export class ResolutionLifecycleStrategy implements ILifecycleStrategy {
+/** Singleton Lifecycle Resolver Strategy. */
+export class SingletonLifecycleResolverStrategy implements ILifecycleResolverStrategy {
   /** @inheritdoc */
   public store<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: LifecycleStrategyStoreInstanceOptions<TType, TDependencies, TInjects>,
   ): void {
-    options.context.setInstance(options.token, options.instance);
+    options.registration.instance = options.instance;
   }
 
   /** @inheritdoc */
   public resolve<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: LifecycleStrategyResolveInstanceOptions<TType, TDependencies, TInjects>,
   ): LifecycleStrategyResolveInstanceReturn<TType> {
-    if (options.context.hasInstance(options.token)) {
-      return [true, options.context.getInstance(options.token)];
+    if ('instance' in options.registration) {
+      const instance = options.registration.instance;
+
+      return {
+        isResolved: true,
+        instance,
+      };
     }
 
-    return [false];
+    return {
+      isResolved: false,
+    };
   }
 }

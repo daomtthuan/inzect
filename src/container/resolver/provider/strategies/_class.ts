@@ -1,11 +1,11 @@
 import type { Class } from 'type-fest';
-import type { ClassInjectionProvider, InjectConstructorParameterOptions, IResolverStrategy } from '~/types';
-import type { Container } from '../../_container';
+import type { ClassInjectionProvider, InjectConstructorParameterOptions, IProviderResolverStrategy } from '~/types';
+import type { Container } from '../../../_container';
 
 import { MetadataKey } from '~/constants';
 
-/** Class Resolver Strategy. */
-export class ClassResolverStrategy implements IResolverStrategy {
+/** Class Provider Resolver Strategy. */
+export class ClassProviderResolverStrategy implements IProviderResolverStrategy {
   /** @inheritdoc */
   public resolve<TType>(container: Container, provider: ClassInjectionProvider<TType>): TType {
     return this.#constructInstance(container, provider.useClass);
