@@ -67,7 +67,7 @@ export interface ILifecycleStrategy {
    * @template TInjects Inject types.
    * @param options Lifecycle Strategy Store Instance Options.
    */
-  storeInstance<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
+  store<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: LifecycleStrategyStoreInstanceOptions<TType, TDependencies, TInjects>,
   ): void;
 
@@ -81,7 +81,7 @@ export interface ILifecycleStrategy {
    *
    * @returns Resolved Instance return.
    */
-  resolveInstance<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
+  resolve<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
     options: LifecycleStrategyResolveInstanceOptions<TType, TDependencies, TInjects>,
   ): LifecycleStrategyResolveInstanceReturn<TType>;
 }

@@ -3,12 +3,12 @@ import type { ILifecycleStrategy, LifecycleStrategyResolveInstanceReturn } from 
 /** Transient Lifecycle Strategy. */
 export class TransientLifecycleStrategy implements ILifecycleStrategy {
   /** @inheritdoc */
-  public storeInstance(): void {
+  public store(): void {
     // Do nothing
   }
 
   /** @inheritdoc */
-  public resolveInstance<TType>(): LifecycleStrategyResolveInstanceReturn<TType> {
+  public resolve<TType>(): LifecycleStrategyResolveInstanceReturn<TType> {
     return [false];
   }
 }

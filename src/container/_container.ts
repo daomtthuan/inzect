@@ -57,10 +57,11 @@ export class Container implements IDependencyInjectionContainer {
   public resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
   /** @inheritdoc */
   public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
-    const instance = this.resolveInstance(tokenOrOptions);
-    this.#internalResolutionContext.clearInstances();
-
-    return instance;
+    try {
+      return this.resolveInstance(tokenOrOptions);
+    } finally {
+      this.#internalResolutionContext.clearInstances();
+    }
   }
 
   /** @inheritdoc */
@@ -87,7 +88,7 @@ export class Container implements IDependencyInjectionContainer {
    * @returns Instance.
    */
   public resolveInstance<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): TType | undefined {
-    const options = this.#normalizeResolveInstanceOptions(arg);
+    const options = this.#normalizeResolveOptions(arg);
     const token = options.token;
 
     const registration = this.#registry.get(token);
@@ -96,7 +97,7 @@ export class Container implements IDependencyInjectionContainer {
     }
 
     const lifecycle = LifecycleStrategyFactory.get(registration.scope);
-    const [isResolved, instance] = lifecycle.resolveInstance({
+    const [isResolved, instance] = lifecycle.resolve({
       token,
       registration,
       context: this.#internalResolutionContext,
@@ -108,7 +109,7 @@ export class Container implements IDependencyInjectionContainer {
     return this.#resolveRegistration(token, registration);
   }
 
-  #normalizeResolveInstanceOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): ResolveInstanceOptions<TType> {
+  #normalizeResolveOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): ResolveInstanceOptions<TType> {
     if (typeof arg === 'object' && 'token' in arg) {
       const token = TypeHelper.isFunction(arg.token) ? arg.token() : arg.token;
 
@@ -164,7 +165,7 @@ export class Container implements IDependencyInjectionContainer {
     const instance = resolver.resolve(this, provider);
 
     const lifecycle = LifecycleStrategyFactory.get(scope);
-    lifecycle.storeInstance({
+    lifecycle.store({
       token,
       registration,
       context: this.#internalResolutionContext,
