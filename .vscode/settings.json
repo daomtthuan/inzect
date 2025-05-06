@@ -93,6 +93,18 @@
   "jest.runMode": "on-demand",
   "markdown.extension.tableFormatter.normalizeIndentation": true,
   "markdown.extension.toc.levels": "2..4",
+  "markdownlint.config": {
+    "default": true,
+    "MD024": {
+      "siblings_only": true
+    }
+  },
+  "material-icon-theme.activeIconPack": "none",
+  "material-icon-theme.folders.associations": {
+    "lifecycle": "ci",
+    "registry": "store",
+    "strategies": "functions"
+  },
   "prettier.enableDebugLogs": true,
   "prettier.endOfLine": "lf",
   "sort-json.settings.excludePaths": ["tsImportSorter.configuration.groupRules"],
@@ -171,12 +183,8 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.activityBar.location": "top",
   "workbench.colorTheme": "Catppuccin Mocha",
-  "workbench.iconTheme": "catppuccin-mocha",
+  "workbench.iconTheme": "material-icon-theme",
   "workbench.productIconTheme": "material-product-icons",
   "workbench.startupEditor": "none",
-  "workbench.tree.enableStickyScroll": false,
-  "markdownlint.config": {
-    "default": true,
-    "MD024": { "siblings_only": true }
-  }
+  "workbench.tree.enableStickyScroll": false
 }
