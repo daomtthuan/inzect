@@ -1,10 +1,10 @@
-# Inzect
+# **Inzect**
 
 [![npm](https://img.shields.io/npm/v/inzect.svg)](https://www.npmjs.com/package/inzect)
 [![npm](https://img.shields.io/npm/dt/inzect.svg)](https://www.npmjs.com/package/inzect)
 
-**Inzect** is a lightweight injection container for TypeScript and JavaScript.\
-It is built upon thee [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators).
+> **Inzect** is a lightweight injection container for TypeScript and JavaScript.\
+> It is built upon thee **[Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.
 
 ## 📑 Table of contents
 
@@ -80,8 +80,7 @@ Use this decorator to register a class as a provider that can be injected into o
 
 ##### Options
 
-- `token` — Injection Token (see [Token](#token)).
-- `provider` — Injection Provider (see [Provider](#provider)).
+- `token` — Injection Token (see [Token](#token)). Leave empty to use the `class` as the token.
 - `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
 ##### Usage
@@ -105,8 +104,14 @@ Use this decorator to inject into class fields or class properties. Or use this 
 
 ##### Options
 
-- `token` — Injection Token (see [Token](#token)).
-- `optional` (**default**: `false`) — Whether the dependency is optional.
+1. Inject into class fields or class properties.
+
+   - `token` — Injection Token (see [Token](#token)).
+   - `optional` (**default**: `false`) — Whether the dependency is optional.
+
+2. Inject into constructor parameters.
+
+   - `injects` — List of `Inject Parameter`.
 
 ##### Usage
 
@@ -224,6 +229,7 @@ Resolves a dependency.
 
 - `token` — Injection Token (see [Token](#token)).
 - `optional` (**default**: `false`) — Whether the dependency is optional.
+- `context` — Resolution context. Leave empty to use the default context for resolving dependencies.
 
 ##### Usage
 

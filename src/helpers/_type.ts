@@ -1,6 +1,6 @@
 import type { Class, Primitive } from 'type-fest';
 
-/** Helper for Type. */
+/** Helper for Data Type. */
 export class TypeHelper {
   static readonly #primitiveTypes = ['string', 'number', 'boolean', 'symbol', 'bigint'];
 

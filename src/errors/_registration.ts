@@ -1,18 +1,21 @@
-import type { InjectionToken, InjectTokenOrOptions, Registration, RegistrationErrorOptions } from '~/types';
+import type { Registration } from '~/types/container';
+import type { RegistrationErrorOptions } from '~/types/error';
+import type { InjectParameter } from '~/types/injector';
+import type { InjectionToken } from '~/types/token';
 
 /**
  * Dependency Registration Error.
  *
  * @template TType Type of instance.
  * @template TDependencies Dependencies types.
- * @template TInjects Inject types.
+ * @template TInjectParameters Inject parameter types.
  */
-export class RegistrationError<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]> extends Error {
+export class RegistrationError<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]> extends Error {
   readonly #token: InjectionToken<TType>;
-  readonly #registration: Registration<TType, TDependencies, TInjects>;
+  readonly #registration: Registration<TType, TDependencies, TInjectParameters>;
 
   /** @param options Registration Error Options. */
-  public constructor(options: RegistrationErrorOptions<TType, TDependencies, TInjects>) {
+  public constructor(options: RegistrationErrorOptions<TType, TDependencies, TInjectParameters>) {
     super(options.message, {
       cause: {
         ...options.cause,
@@ -31,7 +34,7 @@ export class RegistrationError<TType, TDependencies extends unknown[], TInjects 
   }
 
   /** @returns Registration. */
-  public get registration(): Registration<TType, TDependencies, TInjects> {
+  public get registration(): Registration<TType, TDependencies, TInjectParameters> {
     return this.#registration;
   }
 }

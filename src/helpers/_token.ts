@@ -1,16 +1,28 @@
-import type { ClassInjectionToken, InjectionToken, InjectionTokenMapKey, PrimitiveInjectionToken, PrimitiveInjectionTokenMapKey } from '~/types';
+import type { PrimitiveTokenMapKey, TokenMapKey } from '~/types/map';
+import type { ClassInjectionToken, InjectionToken, PrimitiveInjectionToken } from '~/types/token';
 
 import { ArgumentError } from '~/errors';
 import { TypeHelper } from './_type';
 
 /** Helper for Injection Token. */
 export class TokenHelper {
-  static readonly #primitiveKeyMap: Map<PrimitiveInjectionToken, PrimitiveInjectionTokenMapKey> = new Map();
+  static readonly #primitiveTokenMap: Map<PrimitiveInjectionToken, PrimitiveTokenMapKey> = new Map();
+
+  /**
+   * Check if the token is {@link InjectionToken}
+   *
+   * @param token Token to check.
+   *
+   * @returns `true` if the token is {@link InjectionToken}, `false` otherwise.
+   */
+  public static isInjectionToken<TType>(token: unknown): token is InjectionToken<TType> {
+    return TokenHelper.isPrimitiveInjectionToken(token) || TokenHelper.isClassInjectionToken(token);
+  }
 
   /**
    * Check if the token is {@link PrimitiveInjectionToken}
    *
-   * @param token Injection token.
+   * @param token Token to check.
    *
    * @returns `true` if the token is {@link PrimitiveInjectionToken}, `false` otherwise.
    */
@@ -21,7 +33,7 @@ export class TokenHelper {
   /**
    * Check if the token is {@link ClassInjectionToken}
    *
-   * @param token Injection token.
+   * @param token Token to check.
    *
    * @returns `true` if the token is {@link ClassInjectionToken}, `false` otherwise.
    */
@@ -36,13 +48,15 @@ export class TokenHelper {
    *
    * @returns Map key.
    */
-  public static createMapKey<TType>(token: InjectionToken<TType>): InjectionTokenMapKey<TType> {
+  public static createMapKey<TType>(token: InjectionToken<TType>): TokenMapKey<TType> {
     if (TokenHelper.isPrimitiveInjectionToken(token)) {
-      if (!TokenHelper.#primitiveKeyMap.has(token)) {
-        TokenHelper.#primitiveKeyMap.set(token, { value: token });
+      if (!TokenHelper.#primitiveTokenMap.has(token)) {
+        TokenHelper.#primitiveTokenMap.set(token, {
+          value: token,
+        });
       }
 
-      return TokenHelper.#primitiveKeyMap.get(token)!;
+      return TokenHelper.#primitiveTokenMap.get(token)!;
     }
 
     if (TokenHelper.isClassInjectionToken(token)) {
@@ -58,7 +72,7 @@ export class TokenHelper {
   /**
    * Stringify the token.
    *
-   * @param token Injection token.
+   * @param token Token to stringify.
    *
    * @returns Stringified token.
    */
@@ -75,5 +89,16 @@ export class TokenHelper {
       argument: token,
       message: 'Invalid token',
     });
+  }
+
+  /**
+   * Normalize token.
+   *
+   * @param token Token to normalize.
+   *
+   * @returns Normalized token.
+   */
+  public static normalize<TType>(token: InjectionToken<TType>): InjectionToken<TType> {
+    return token;
   }
 }

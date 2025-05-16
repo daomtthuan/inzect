@@ -5,7 +5,7 @@
       "name": "Test",
       "type": "node-terminal",
       "request": "launch",
-      "command": "pnpm tsx ./playground/index.ts",
+      "command": "pnpm script playground lifecycle",
       "cwd": "${workspaceFolder}"
     }
   ]

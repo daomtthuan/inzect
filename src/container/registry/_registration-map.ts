@@ -1,17 +1,18 @@
-import type { InjectionTokenMapKey, InjectTokenOrOptions, Registration } from '~/types';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import type { Registration } from '~/types/container';
+import type { InjectParameter } from '~/types/injector';
+import type { TokenMapKey } from '~/types/map';
 
 /**
  * Registration Map.
  *
  * @template TType Type of instance.
  * @template TDependencies Dependencies types.
- * @template TInjects Inject types.
+ * @template TInjectParameters Inject parameter types.
  */
 export class RegistrationMap<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TType = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TDependencies extends unknown[] = any[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TInjects extends InjectTokenOrOptions<unknown>[] = any[],
-> extends WeakMap<InjectionTokenMapKey<TType>, Registration<TType, TDependencies, TInjects>[]> {}
+  TInjectParameters extends InjectParameter<unknown>[] = any[],
+> extends WeakMap<TokenMapKey<TType>, Registration<TType, TDependencies, TInjectParameters>[]> {}

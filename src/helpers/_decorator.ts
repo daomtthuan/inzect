@@ -1,4 +1,4 @@
-import type { ClassDecorator, ClassFieldDecorator, ClassType } from '~/types';
+import type { ClassDecorator, ClassFieldDecorator, DecoratedClass } from '~/types/decorator';
 
 import { TypeHelper } from './_type';
 
@@ -8,12 +8,12 @@ export class DecoratorHelper {
    * Check if the arguments are valid for a class decorator.
    *
    * @template TTarget Target class.
-   * @template TDecorate Decorated class.
+   * @template TDecorate Transformed class.
    * @param args Arguments.
    *
    * @returns `true` if the arguments are valid for a class decorator, `false` otherwise.
    */
-  public static isClassDecoratorParameters<TTarget extends ClassType<unknown>, TDecorate extends ClassType<unknown>>(
+  public static isClassDecoratorParameters<TTarget extends DecoratedClass, TDecorate extends DecoratedClass>(
     args: [target: TTarget | undefined, context: DecoratorContext],
   ): args is Parameters<ClassDecorator<TTarget, TDecorate>> {
     const [target, context] = args;

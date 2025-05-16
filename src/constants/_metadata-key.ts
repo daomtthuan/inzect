@@ -1,5 +1,5 @@
 /** Metadata Key. */
 export class MetadataKey {
-  /** Inject Constructor Parameter Options. */
-  public static readonly InjectConstructorParameterOptions: symbol = Symbol('InjectConstructorParameterOptions');
+  /** Inject Constructor Parameter Metadata Key. */
+  public static readonly InjectConstructorParameter: symbol = Symbol('InjectConstructorParameter');
 }

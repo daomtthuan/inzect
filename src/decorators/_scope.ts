@@ -1,6 +1,6 @@
 import type { Class } from 'type-fest';
 import type { Lifecycle } from '~/constants';
-import type { ClassDecorator } from '~/types';
+import type { ClassDecorator } from '~/types/decorator';
 
 import { Container } from '~/container';
 
@@ -15,7 +15,7 @@ import { Container } from '~/container';
  */
 export function Scope<TTarget extends Class<unknown>>(scope: Lifecycle): ClassDecorator<TTarget> {
   return (target) => {
-    Container.instance.register({
+    Container._instance.register({
       token: target,
       provider: {
         useClass: target,

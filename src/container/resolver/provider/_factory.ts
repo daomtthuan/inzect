@@ -1,40 +1,48 @@
 import type { Class } from 'type-fest';
-import type { InjectionProvider, InjectTokenOrOptions, IProviderResolverStrategy } from '~/types';
+import type { Container } from '~/container';
+import type { ProviderResolverStrategy } from '~/types/container';
+import type { InjectParameter } from '~/types/injector';
+import type { InjectionProvider } from '~/types/provider';
 
 import { ArgumentError } from '~/errors';
 import { ProviderHelper } from '~/helpers';
-import { ClassProviderResolverStrategy } from './strategies/_class';
-import { FactoryProviderResolverStrategy } from './strategies/_factory';
-import { ValueProviderResolverStrategy } from './strategies/_value';
+import { ClassProviderResolverStrategy, FactoryProviderResolverStrategy, ValueProviderResolverStrategy } from './strategies';
 
-/** Provider Resolver Strategy Factory. */
-export class ProviderResolverStrategyFactory {
-  static readonly #strategyInstances: WeakMap<Class<IProviderResolverStrategy>, IProviderResolverStrategy> = new WeakMap();
+/** Provider Resolver Factory. */
+export class ProviderResolverFactory {
+  readonly #strategyInstances: WeakMap<Class<ProviderResolverStrategy>, ProviderResolverStrategy>;
+  readonly #container: Container;
+
+  /** @param container Container reference. */
+  public constructor(container: Container) {
+    this.#strategyInstances = new WeakMap();
+    this.#container = container;
+  }
 
   /**
    * Get Resolver Strategy.
    *
    * @template TType Type of instance.
    * @template TDependencies Dependencies types.
-   * @template TInjects Inject types.
+   * @template TInjectParameters Inject parameter types.
    * @param provider Provider.
    *
    * @returns Resolver Strategy.
    */
-  public static get<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    provider: InjectionProvider<TType, TDependencies, TInjects>,
-  ): IProviderResolverStrategy {
-    const strategyConstructor = ProviderResolverStrategyFactory.#getStrategyConstructor(provider);
-    if (!ProviderResolverStrategyFactory.#strategyInstances.has(strategyConstructor)) {
-      ProviderResolverStrategyFactory.#strategyInstances.set(strategyConstructor, new strategyConstructor());
+  public get<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+    provider: InjectionProvider<TType, TDependencies, TInjectParameters>,
+  ): ProviderResolverStrategy {
+    const ProviderResolver = this.#getStrategyConstructor(provider);
+    if (!this.#strategyInstances.has(ProviderResolver)) {
+      this.#strategyInstances.set(ProviderResolver, new ProviderResolver(this.#container));
     }
 
-    return ProviderResolverStrategyFactory.#strategyInstances.get(strategyConstructor)!;
+    return this.#strategyInstances.get(ProviderResolver)!;
   }
 
-  static #getStrategyConstructor<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    provider: InjectionProvider<TType, TDependencies, TInjects>,
-  ): Class<IProviderResolverStrategy> {
+  #getStrategyConstructor<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+    provider: InjectionProvider<TType, TDependencies, TInjectParameters>,
+  ): Class<ProviderResolverStrategy> {
     if (ProviderHelper.isClassProvider(provider)) {
       return ClassProviderResolverStrategy;
     }

@@ -1,4 +1,5 @@
-export * from './_decorator';
-export * from './_provider';
-export * from './_token';
-export * from './_type';
+export { DecoratorHelper } from './_decorator';
+export { InjectorHelper } from './_injector';
+export { ProviderHelper } from './_provider';
+export { TokenHelper } from './_token';
+export { TypeHelper } from './_type';

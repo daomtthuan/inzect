@@ -1,20 +1,12 @@
 import type { Class } from 'type-fest';
-import type {
-  ClassDecorator,
-  ClassFieldDecorator,
-  InjectConstructorParameterOptions,
-  InjectionToken,
-  InjectParameter,
-  InjectReturn,
-  InjectTokenFactory,
-  OptionalInjectOptions,
-  RequiredInjectOptions,
-} from '~/types';
+import type { ClassDecorator, ClassFieldDecorator, InjectResult } from '~/types/decorator';
+import type { InjectParameter } from '~/types/injector';
+import type { InjectionToken } from '~/types/token';
 
 import { MetadataKey } from '~/constants';
 import { Container } from '~/container';
 import { ArgumentError } from '~/errors';
-import { DecoratorHelper } from '~/helpers';
+import { DecoratorHelper, TokenHelper } from '~/helpers';
 
 /**
  * Decorator factory to mark parameters of constructor will be injected.
@@ -22,116 +14,88 @@ import { DecoratorHelper } from '~/helpers';
  * @overload
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param options Inject Constructor Parameter Options.
+ * @param injects Inject Constructor Parameters.
  *
- * @returns Inject decorator.
+ * @returns Inject Decorator.
  */
-export function Inject<TTarget extends Class<unknown>, TType>(options: InjectConstructorParameterOptions<TType>): ClassDecorator<TTarget>;
+export function Inject<TTarget extends Class<unknown>, TType>(injects: InjectParameter<TType>[]): ClassDecorator<TTarget>;
 /**
  * Decorator factory to mark a class field will be injected.
  *
  * @overload
  * @template TType Type of instance.
  * @param token Injection Token.
+ * @param optional If `true`, inject `undefined` if the token is not registered.
  *
- * @returns Inject decorator.
+ * @returns Inject Decorator.
  */
-export function Inject<TType>(token: InjectionToken<TType>): ClassFieldDecorator<TType>;
-/**
- * Decorator factory to mark a class field will be injected.
- *
- * @overload
- * @template TType Type of instance.
- * @param options Required Inject Options.
- *
- * @returns Inject decorator.
- */
-export function Inject<TType>(options: RequiredInjectOptions<TType>): ClassFieldDecorator<TType>;
-/**
- * Decorator factory to mark a class field will be injected.\
- * `undefined` is injected if the token is not registered.
- *
- * @overload
- * @template TType Type of instance.
- * @param options Optional Inject Options.
- *
- * @returns Inject decorator.
- */
-export function Inject<TType>(options: OptionalInjectOptions<TType>): ClassFieldDecorator<TType, TType | undefined>;
-/**
- * Decorator factory to mark a class field will be injected.
- *
- * @overload
- * @template TType Type of instance.
- * @param factory Inject Token Factory.
- *
- * @returns Inject decorator.
- */
-export function Inject<TType>(factory: InjectTokenFactory<TType>): ClassFieldDecorator<TType>;
+export function Inject<TType>(token: InjectionToken<TType>, optional?: boolean): ClassFieldDecorator<TType>;
 /**
  * Decorator factory to mark a class field will be injected.
  *
  * @overload
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param injectArg Inject argument.
+ * @param tokenOrInjects Injection Token or Inject Constructor Parameters.
+ * @param optional If `true`, inject `undefined` if the token is not registered.
  *
- * @returns Inject decorator.
+ * @returns Inject Decorator.
  */
-export function Inject<TTarget extends Class<unknown>, TType>(injectArg: InjectParameter<TType>): InjectReturn<TTarget, TType> {
+export function Inject<TTarget extends Class<unknown>, TType>(
+  tokenOrInjects: InjectionToken<TType> | InjectParameter<TType>[],
+  optional: boolean = false,
+): InjectResult<TTarget, TType> {
   return (
-    ...decoratorArgs: [target: TTarget | undefined, context: ClassDecoratorContext | ClassFieldDecoratorContext]
+    ...args: [target: TTarget | undefined, context: ClassDecoratorContext | ClassFieldDecoratorContext]
   ): void | ((value: TType) => TType | undefined) => {
-    if (DecoratorHelper.isClassDecoratorParameters(decoratorArgs)) {
-      const [_target, context] = decoratorArgs;
-      return applyInjectClass(injectArg, context);
+    if (DecoratorHelper.isClassDecoratorParameters(args) && Array.isArray(tokenOrInjects)) {
+      const injects = tokenOrInjects;
+      return applyInjectClass(args, injects);
     }
 
-    if (DecoratorHelper.isClassFieldDecoratorParameters(decoratorArgs)) {
-      return applyInjectField(injectArg);
+    if (DecoratorHelper.isClassFieldDecoratorParameters(args) && TokenHelper.isInjectionToken(tokenOrInjects)) {
+      const token = tokenOrInjects;
+      return applyInjectField(token, optional);
     }
 
     throw new ArgumentError({
-      argument: decoratorArgs,
+      argument: args,
       message: 'Invalid Inject arguments',
     });
   };
 }
 
 /**
- * Apply Inject field decorator.
- *
- * @template TType Type of instance.
- * @param injectArg Inject argument.
- *
- * @returns Return of Inject field decorator.
- */
-function applyInjectField<TType>(injectArg: InjectParameter<TType>): (value: TType) => TType | undefined {
-  if (Array.isArray(injectArg)) {
-    throw new ArgumentError({
-      argument: injectArg,
-      message: 'Only one argument is allowed',
-    });
-  }
-
-  return () => Container.instance.resolveInstance(injectArg);
-}
-
-/**
- * Apply Inject Class decorator factory.
+ * Apply Inject Class Decorator factory.
  *
  * @template TTarget Target class.
  * @template TType Type of instance.
- * @param injectArg Inject argument.
- * @param context Class decorator Context.
+ * @param decoratorArgs Decorator arguments.
+ * @param injects Inject Constructor Parameters.
  */
-function applyInjectClass<TType>(injectArg: InjectParameter<TType>, context: ClassDecoratorContext): void {
-  if (!Array.isArray(injectArg) || injectArg.length === 0) {
+function applyInjectClass<TTarget extends Class<unknown>, TType>(
+  [_target, context]: Parameters<ClassDecorator<TTarget>>,
+  injects: InjectParameter<TType>[],
+): void {
+  if (injects.length === 0) {
     throw new ArgumentError({
-      argument: injectArg,
-      message: 'At least one argument is required',
+      argument: injects,
+      message: 'At least one inject argument is required',
     });
   }
 
-  context.metadata[MetadataKey.InjectConstructorParameterOptions] = injectArg;
+  context.metadata[MetadataKey.InjectConstructorParameter] = injects;
+}
+
+/**
+ * Apply Inject Field Decorator.
+ *
+ * @template TType Type of instance.
+ * @param token Injection Token.
+ * @param optional If `true`, inject `undefined` if the token is not registered.
+ *
+ * @returns Return of Inject Field Decorator.
+ */
+function applyInjectField<TType>(token: InjectionToken<TType>, optional: boolean): ReturnType<ClassFieldDecorator<TType, TType | undefined>> {
+  return () => Container._instance._resolve(token, optional);
 }

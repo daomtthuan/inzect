@@ -1,28 +1,30 @@
-# Inzect
+# **Inzect**
 
 [![npm](https://img.shields.io/npm/v/inzect.svg)](https://www.npmjs.com/package/inzect)
 [![npm](https://img.shields.io/npm/dt/inzect.svg)](https://www.npmjs.com/package/inzect)
 
-**Inzect** is a lightweight injection container for TypeScript and JavaScript.\
-It is built upon thee [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators).
+> **Inzect** is a lightweight injection container for TypeScript and JavaScript.\
+> It is built upon thee **[Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.
 
-## Table of contents
+## 📑 Table of contents
 
-- [Table of contents](#table-of-contents)
+- [📑 Table of contents](#-table-of-contents)
 - [⚙️ Installation](#️-installation)
-- [📘 API](#-api)
+- [📘 APIs](#-apis)
   - [Decorators](#decorators)
     - [`@Injectable()`](#injectable)
     - [`@Inject()`](#inject)
     - [`@Scope()`](#scope)
   - [Container](#container)
-    - [Injection Token](#injection-token)
-    - [Injection Provider](#injection-provider)
-    - [Lifecycle Scope](#lifecycle-scope)
     - [`container.register()`](#containerregister)
-    - [`container.resolve()`](#containerresolve)
+    - [`container.unregister()`](#containerunregister)
     - [`container.isRegistered()`](#containerisregistered)
     - [`container.clear()`](#containerclear)
+    - [`container.resolve()`](#containerresolve)
+  - [Injection](#injection)
+    - [Token](#token)
+    - [Provider](#provider)
+    - [Lifecycle](#lifecycle)
 - [🧪 Planned Features](#-planned-features)
   - [Circular Dependencies](#circular-dependencies)
   - [Disposable Instances](#disposable-instances)
@@ -64,7 +66,7 @@ Specifically, **do not enable** `experimentalDecorators` or `emitDecoratorMetada
 }
 ```
 
-## 📘 API
+## 📘 APIs
 
 **Inzect** performs [Constructor Injection](https://en.wikipedia.org/wiki/Dependency_injection#Constructor_injection)
 on the constructors of decorated classes.
@@ -78,9 +80,8 @@ Use this decorator to register a class as a provider that can be injected into o
 
 ##### Options
 
-- `token` — Injection Token (see [Injection Token](#injection-token)).
-- `provider` — Injection Provider (see [Injection Provider](#injection-provider)).
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
+- `token` — Injection Token (see [Token](#token)). Leave empty to use the `class` as the token.
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
 ##### Usage
 
@@ -114,8 +115,14 @@ Use this decorator to inject into class fields or class properties. Or use this 
 
 ##### Options
 
-- `token` — Injection Token (see [Injection Token](#injection-token)).
-- `optional` (**default**: `false`) — Whether the dependency is optional.
+1. Inject into class fields or class properties.
+
+   - `token` — Injection Token (see [Token](#token)).
+   - `optional` (**default**: `false`) — Whether the dependency is optional.
+
+2. Inject into constructor parameters.
+
+   - `injects` — List of `Inject Parameter`.
 
 ##### Usage
 
@@ -166,7 +173,7 @@ Use this decorator to control how and when instances are created.
 
 ##### Options
 
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
 ##### Usage
 
@@ -194,16 +201,154 @@ Unlike legacy decorators, **Stage 3 does not support `emitDecoratorMetadata`**, 
 
 As a result, **you must explicitly specify the token to inject in most cases**, using the `@Inject()` to decorate (see [Inject](#inject)).
 
-#### Injection Token
+#### `container.register()`
+
+Registers a provider with the container.
+
+##### Options
+
+- `token` — Injection Token (see [Token](#token)).
+- `provider` — Injection Provider (see [Provider](#provider)).
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+
+##### Usage
+
+```ts
+// index.ts
+
+import { container, Lifecycle } from 'inzect';
+import { Logger } from '~examples/modules/logger';
+
+container.register({
+  token: 'logger',
+  provider: {
+    useClass: Logger,
+  },
+  scope: Lifecycle.Resolution,
+});
+```
+
+#### `container.unregister()`
+
+Unregister a dependency.
+
+##### Options
+
+- `token` — Injection Token (see [Token](#token)).
+
+##### Usage
+
+```ts
+// index.ts
+
+import { container } from 'inzect';
+
+class Service {}
+
+container.register({
+  token: Service,
+  provider: {
+    useClass: Service,
+  },
+});
+
+console.log(container.isRegistered(Service)); // true
+
+container.unregister(Service);
+console.log(container.isRegistered(Service)); // false
+```
+
+#### `container.isRegistered()`
+
+Check if a dependency is registered.
+
+##### Options
+
+- `token` — Injection Token (see [Token](#token)).
+
+##### Usage
+
+```ts
+// index.ts
+
+import { container, Injectable } from 'inzect';
+
+@Injectable()
+class Service {}
+
+console.log(container.isRegistered(Service)); // true
+console.log(container.isRegistered('some-token')); // false
+```
+
+#### `container.clear()`
+
+Clears all registered dependencies.
+
+##### Usage
+
+```ts
+// index.ts
+
+import { container } from 'inzect';
+
+class Service {}
+
+container.register({
+  token: Service,
+  provider: {
+    useClass: Service,
+  },
+});
+
+console.log(container.isRegistered(Service)); // true
+
+container.clear();
+console.log(container.isRegistered(Service)); // false
+```
+
+#### `container.resolve()`
+
+Resolves a dependency.
+
+##### Options
+
+- `token` — Injection Token (see [Token](#token)).
+- `optional` (**default**: `false`) — Whether the dependency is optional.
+- `context` — Resolution context. Leave empty to use the default context for resolving dependencies.
+
+##### Usage
+
+```ts
+// index.ts
+
+import { container } from 'inzect';
+import { Logger } from '~examples/modules/logger';
+
+const LOGGER_TOKEN = Symbol('logger');
+
+container.register({
+  token: LOGGER_TOKEN,
+  provider: {
+    useClass: Logger,
+  },
+});
+
+const logger = container.resolve<Logger>(LOGGER_TOKEN);
+logger.log('Hello world!');
+```
+
+### Injection
+
+#### Token
 
 An **injection token** is used to identify a provider.
 
 Such tokens can be:
 
-- Class
+- Class: `class`, `abstract class`
 - Primitive: `string`, `number`, `boolean`, `symbol`, `bigint`
 
-#### Injection Provider
+#### Provider
 
 ##### Class Injection Provider
 
@@ -290,16 +435,19 @@ container.register({
 });
 ```
 
-#### Lifecycle Scope
+#### Lifecycle
 
 The **lifecycle scope** of a provider defines how and when instances are created.
-Supported scopes are:
 
-- `Lifecycle.Singleton` — One shared instance across the entire application.
-- `Lifecycle.Transient` — A new instance is created every time the provider is injected.
-- `Lifecycle.Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that graph.
+##### Options
 
-##### Singleton Scope
+- `Singleton` — One shared instance across the entire application.
+- `Transient` — A new instance is created every time the provider is injected.
+- `Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that graph.
+
+##### Usage
+
+###### Singleton Scope
 
 ```ts
 // index.ts
@@ -315,7 +463,7 @@ const service2 = container.resolve(Service);
 console.log(service1 === service2); // true
 ```
 
-##### Transient Scope
+###### Transient Scope
 
 ```ts
 // index.ts
@@ -331,7 +479,7 @@ const service2 = container.resolve(Service);
 console.log(service1 === service2); // false
 ```
 
-##### Resolution Scope
+###### Resolution Scope
 
 ```ts
 // index.ts
@@ -358,111 +506,6 @@ class App {
 
 const app = container.resolve(App);
 app.run();
-```
-
-#### `container.register()`
-
-Registers a provider with the container.
-
-##### Options
-
-- `token` — Injection Token (see [Injection Token](#injection-token)).
-- `provider` — Injection Provider (see [Injection Provider](#injection-provider)).
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
-
-##### Usage
-
-```ts
-// index.ts
-
-import { container, Lifecycle } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-container.register({
-  token: 'logger',
-  provider: {
-    useClass: Logger,
-  },
-  scope: Lifecycle.Resolution,
-});
-```
-
-#### `container.resolve()`
-
-Resolves a dependency.
-
-##### Options
-
-- `token` — Injection Token (see [Injection Token](#injection-token)).
-- `optional` (**default**: `false`) — Whether the dependency is optional.
-
-##### Usage
-
-```ts
-// index.ts
-
-import { container } from 'inzect';
-import { Logger } from '~examples/modules/logger';
-
-const LOGGER_TOKEN = Symbol('logger');
-
-container.register({
-  token: LOGGER_TOKEN,
-  provider: {
-    useClass: Logger,
-  },
-});
-
-const logger = container.resolve<Logger>(LOGGER_TOKEN);
-logger.log('Hello world!');
-```
-
-#### `container.isRegistered()`
-
-Check if a dependency is registered.
-
-##### Options
-
-- `token` — Injection Token (see [Injection Token](#injection-token)).
-
-##### Usage
-
-```ts
-// index.ts
-
-import { container, Injectable } from 'inzect';
-
-@Injectable()
-class Service {}
-
-console.log(container.isRegistered(Service)); // true
-console.log(container.isRegistered('some-token')); // false
-```
-
-#### `container.clear()`
-
-Clears all registered dependencies.
-
-##### Usage
-
-```ts
-// index.ts
-
-import { container } from 'inzect';
-
-class Service {}
-
-container.register({
-  token: Service,
-  provider: {
-    useClass: Service,
-  },
-});
-
-console.log(container.isRegistered(Service)); // true
-
-container.clear();
-console.log(container.isRegistered(Service)); // false
 ```
 
 ## 🧪 Planned Features

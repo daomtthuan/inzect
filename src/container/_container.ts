@@ -1,66 +1,63 @@
 import type {
-  ClassInjectionProvider,
-  ClassRegisterOptions,
-  FactoryRegisterOptions,
-  IDependencyInjectionContainer,
-  InjectionToken,
-  InjectTokenFactory,
-  InjectTokenOrOptions,
-  LifecycleResolverOptions,
-  NormalizeResolveOptions,
-  OptionalResolveOptions,
-  RegisterOptions,
-  Registration,
-  RequiredResolveOptions,
-  ResolveOptions,
-  ValueRegisterOptions,
-} from '~/types';
+  DependencyInjectionContainer,
+  DependencyInjectionRegistry,
+  DependencyInjectionResolver,
+  RegisterParameter,
+  ResolutionContext,
+} from '~/types/container';
+import type { InjectParameter } from '~/types/injector';
+import type { InjectionToken } from '~/types/token';
 
 import { Lifecycle } from '~/constants';
-import { ResolutionError } from '~/errors';
-import { TokenHelper, TypeHelper } from '~/helpers';
-import { ResolutionContext } from './context/_resolution-context';
-import { Registry } from './registry/_registry';
-import { LifecycleResolverStrategyFactory } from './resolver/lifecycle/_factory';
-import { ProviderResolverStrategyFactory } from './resolver/provider/_factory';
+import { Context } from './context';
+import { Registry } from './registry';
+import { Resolver } from './resolver';
 
 /** Dependency Injection Container. */
-export class Container implements IDependencyInjectionContainer {
+export class Container implements DependencyInjectionContainer {
   static #instance?: Container;
-  readonly #registry = new Registry();
-  readonly #internalResolutionContext = new ResolutionContext();
+
+  readonly #registry: DependencyInjectionRegistry;
+  readonly #resolver: DependencyInjectionResolver;
+  readonly #context: ResolutionContext;
+
+  /**
+   * @param registry Dependency Injection Registry.
+   * @param resolver Dependency Injection Resolver.
+   * @param context Resolution Context.
+   */
+  private constructor(
+    registry: DependencyInjectionRegistry = new Registry(),
+    resolver: DependencyInjectionResolver = new Resolver(this),
+    context: ResolutionContext = new Context(),
+  ) {
+    this.#registry = registry;
+    this.#resolver = resolver;
+    this.#context = context;
+  }
 
   /** @inheritdoc */
-  public register<TType>(options: ClassRegisterOptions<TType>): void;
-  /** @inheritdoc */
-  public register<TType>(options: ValueRegisterOptions<TType>): void;
-  /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    options: FactoryRegisterOptions<TType, TDependencies, TInjects>,
-  ): void;
-  /** @inheritdoc */
-  public register<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    options: RegisterOptions<TType, TDependencies, TInjects>,
-  ): void {
-    this.#registry.set(options.token, {
-      provider: options.provider,
-      scope: options.scope ?? Lifecycle.Transient,
+  public register<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>({
+    token,
+    provider,
+    scope = Lifecycle.Transient,
+  }: RegisterParameter<TType, TDependencies, TInjectParameters>): void {
+    this.#registry.set(token, {
+      provider: provider,
+      scope,
     });
   }
 
   /** @inheritdoc */
-  public resolve<TType>(token: InjectionToken<TType>): TType;
-  /** @inheritdoc */
-  public resolve<TType>(options: RequiredResolveOptions<TType>): TType;
-  /** @inheritdoc */
-  public resolve<TType>(options: OptionalResolveOptions<TType>): TType | undefined;
-  /** @inheritdoc */
-  public resolve<TType>(tokenOrOptions: InjectionToken<TType> | ResolveOptions<TType>): TType | undefined {
-    try {
-      return this.resolveInstance(tokenOrOptions);
-    } finally {
-      this.#internalResolutionContext.clearInstances();
+  public resolve<TType>(token: InjectionToken<TType>, optional: boolean = false, context?: ResolutionContext): TType | undefined {
+    const contextToUse = this.#prepareContext(context);
+
+    const registration = this.#registry.get(token);
+    if (!registration) {
+      return this.#resolver.resolveUnregistered(token, optional, contextToUse);
     }
+
+    return this.#resolver.resolveRegistration(token, registration, contextToUse);
   }
 
   /** @inheritdoc */
@@ -79,101 +76,33 @@ export class Container implements IDependencyInjectionContainer {
   }
 
   /**
-   * Resolve instance.
+   * Resolve with internal context.
    *
-   * @template TType Type of instance.
-   * @param arg Internal resolve argument.
+   * @param token Injection Token.
+   * @param optional If `true`, returns `undefined` if the token is not registered.
    *
-   * @returns Instance.
+   * @returns Resolved instance.
+   * @internal
    */
-  public resolveInstance<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): TType | undefined {
-    const options = this.#normalizeResolveOptions(arg);
-
-    const registration = this.#registry.get(options.token);
-    if (!registration) {
-      return this.#resolveUnregisteredRegistration(options.token, options.optional);
-    }
-
-    return this.#resolveRegistration(options.token, registration);
-  }
-
-  #normalizeResolveOptions<TType>(arg: InjectTokenOrOptions<TType> | InjectTokenFactory<TType> | ResolveOptions<TType>): NormalizeResolveOptions<TType> {
-    if (typeof arg === 'object' && 'token' in arg) {
-      const token = TypeHelper.isFunction(arg.token) ? arg.token() : arg.token;
-
-      return {
-        token,
-        optional: arg.optional ?? false,
-      };
-    }
-
-    const token = TypeHelper.isFunction(arg) ? arg() : arg;
-    return {
-      token,
-      optional: false,
-    };
-  }
-
-  #resolveUnregisteredRegistration<TType>(token: InjectionToken<TType>, optional: boolean): TType | undefined {
-    if (TokenHelper.isPrimitiveInjectionToken(token)) {
-      if (optional) {
-        return undefined;
-      }
-
-      throw new ResolutionError({
-        token,
-        message: `Attempted to resolve unregistered token: ${TokenHelper.stringify(token)}`,
-      });
-    }
-
-    // No registration found with this token. But the token is a class, try to construct an instance.
-    if (TypeHelper.isClass(token)) {
-      const provider: ClassInjectionProvider<TType> = { useClass: token };
-      const providerResolver = ProviderResolverStrategyFactory.get(provider);
-      return providerResolver.resolve(this, provider);
-    }
-
-    throw new ResolutionError({
-      token,
-      message: `Attempted to resolve invalid token`,
-    });
-  }
-
-  #resolveRegistration<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    token: InjectionToken<TType>,
-    registration: Registration<TType, TDependencies, TInjects>,
-  ): TType | undefined {
-    const options: LifecycleResolverOptions<TType, TDependencies, TInjects> = {
-      token,
-      registration,
-      context: this.#internalResolutionContext,
-    };
-
-    const lifecycleResolver = LifecycleResolverStrategyFactory.get(registration.scope);
-    const result = lifecycleResolver.resolve(options);
-    if (result.isResolved) {
-      return result.instance;
-    }
-
-    const providerResolver = ProviderResolverStrategyFactory.get(registration.provider);
-    const instance = providerResolver.resolve(this, registration.provider);
-    lifecycleResolver.store(instance, options);
-
-    return instance;
+  public _resolve<TType>(token: InjectionToken<TType>, optional?: boolean): TType | undefined {
+    return this.resolve(token, optional, this.#context);
   }
 
   /**
-   * Get Inject Constructor Parameters Options.
-   *
-   * @template TType Type of instance.
-   * @param constructor Class constructor.
-   *
-   * @returns Inject Constructor Parameters Options.
+   * @returns Dependency Injection Container.
+   * @internal
    */
-
-  /** @returns Container instance. */
-  public static get instance(): Container {
+  public static get _instance(): Container {
     Container.#instance ??= new Container();
     return Container.#instance;
+  }
+
+  #prepareContext(context?: ResolutionContext): ResolutionContext {
+    if (context) {
+      return context;
+    }
+
+    this.#context.clearInstances();
+    return this.#context;
   }
 }

@@ -1,27 +1,36 @@
 import type { Class } from 'type-fest';
-import type { ClassInjectionProvider, InjectConstructorParameterOptions, IProviderResolverStrategy } from '~/types';
-import type { Container } from '../../../_container';
+import type { Container } from '~/container';
+import type { ProviderResolverStrategy, ResolutionContext } from '~/types/container';
+import type { NormalizedInjectParameter } from '~/types/injector';
+import type { ClassInjectionProvider } from '~/types/provider';
 
 import { MetadataKey } from '~/constants';
+import { InjectorHelper } from '~/helpers';
 
 /** Class Provider Resolver Strategy. */
-export class ClassProviderResolverStrategy implements IProviderResolverStrategy {
+export class ClassProviderResolverStrategy implements ProviderResolverStrategy {
+  readonly #container: Container;
+
+  /** @param container Container reference. */
+  public constructor(container: Container) {
+    this.#container = container;
+  }
+
   /** @inheritdoc */
-  public resolve<TType>(container: Container, provider: ClassInjectionProvider<TType>): TType {
-    return this.#constructInstance(container, provider.useClass);
+  public resolve<TType>(provider: ClassInjectionProvider<TType>, context: ResolutionContext): TType {
+    const Instance = provider.useClass;
+    const injects = this.#getInjectParameters(Instance);
+
+    const args = injects.map(({ token, optional }) => this.#container.resolve(token, optional, context));
+    return new Instance(...args);
   }
 
-  #constructInstance<TType>(container: Container, constructor: Class<TType>): TType {
-    const args = this.#getInjectConstructorParameterOptions(constructor).map((options) => container.resolveInstance(options));
-    return new constructor(...args);
-  }
-
-  #getInjectConstructorParameterOptions<TType>(constructor: Class<TType>): InjectConstructorParameterOptions<TType> {
-    const options = constructor[Symbol.metadata]?.[MetadataKey.InjectConstructorParameterOptions];
-    if (!options || !Array.isArray(options)) {
+  #getInjectParameters<TType>(constructor: Class<TType>): NormalizedInjectParameter<TType>[] {
+    const metadata = constructor[Symbol.metadata]?.[MetadataKey.InjectConstructorParameter];
+    if (!metadata || !Array.isArray(metadata)) {
       return [];
     }
 
-    return options;
+    return metadata.map((inject) => InjectorHelper.normalizeInjectParameter(inject));
   }
 }

@@ -1,10 +1,10 @@
-import type { IProviderResolverStrategy, ValueInjectionProvider } from '~/types';
-import type { Container } from '../../../_container';
+import type { ProviderResolverStrategy } from '~/types/container';
+import type { ValueInjectionProvider } from '~/types/provider';
 
 /** Value Provider Resolver Strategy. */
-export class ValueProviderResolverStrategy implements IProviderResolverStrategy {
+export class ValueProviderResolverStrategy implements ProviderResolverStrategy {
   /** @inheritdoc */
-  public resolve<TType>(_container: Container, provider: ValueInjectionProvider<TType>): TType {
+  public resolve<TType>(provider: ValueInjectionProvider<TType>): TType {
     return provider.useValue;
   }
 }

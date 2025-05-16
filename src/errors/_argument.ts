@@ -1,4 +1,4 @@
-import type { ArgumentErrorOptions } from '~/types';
+import type { ArgumentErrorOptions } from '~/types/error';
 
 /**
  * Dependency Argument Error.

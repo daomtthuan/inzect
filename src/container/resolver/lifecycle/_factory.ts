@@ -1,15 +1,17 @@
 import type { Class } from 'type-fest';
-import type { ILifecycleResolverStrategy } from '~/types';
+import type { LifecycleResolverStrategy } from '~/types/container';
 
 import { Lifecycle } from '~/constants';
 import { ArgumentError } from '~/errors';
-import { ResolutionLifecycleResolverStrategy } from './strategies/_resolution';
-import { SingletonLifecycleResolverStrategy } from './strategies/_singleton';
-import { TransientLifecycleResolverStrategy } from './strategies/_transient';
+import { ResolutionLifecycleResolverStrategy, SingletonLifecycleResolverStrategy, TransientLifecycleResolverStrategy } from './strategies';
 
-/** Lifecycle Resolver Strategy Factory. */
-export class LifecycleResolverStrategyFactory {
-  static readonly #strategyInstances: WeakMap<Class<ILifecycleResolverStrategy>, ILifecycleResolverStrategy> = new WeakMap();
+/** Lifecycle Resolver Factory. */
+export class LifecycleResolverFactory {
+  readonly #strategyInstances: WeakMap<Class<LifecycleResolverStrategy>, LifecycleResolverStrategy>;
+
+  public constructor() {
+    this.#strategyInstances = new WeakMap();
+  }
 
   /**
    * Get Lifecycle Strategy.
@@ -18,16 +20,16 @@ export class LifecycleResolverStrategyFactory {
    *
    * @returns Lifecycle Strategy.
    */
-  public static get(scope: Lifecycle): ILifecycleResolverStrategy {
-    const strategyConstructor = LifecycleResolverStrategyFactory.#getStrategyConstructor(scope);
-    if (!LifecycleResolverStrategyFactory.#strategyInstances.has(strategyConstructor)) {
-      LifecycleResolverStrategyFactory.#strategyInstances.set(strategyConstructor, new strategyConstructor());
+  public get(scope: Lifecycle): LifecycleResolverStrategy {
+    const LifecycleResolver = this.#getStrategyConstructor(scope);
+    if (!this.#strategyInstances.has(LifecycleResolver)) {
+      this.#strategyInstances.set(LifecycleResolver, new LifecycleResolver());
     }
 
-    return LifecycleResolverStrategyFactory.#strategyInstances.get(strategyConstructor)!;
+    return this.#strategyInstances.get(LifecycleResolver)!;
   }
 
-  static #getStrategyConstructor(scope: Lifecycle): Class<ILifecycleResolverStrategy> {
+  #getStrategyConstructor(scope: Lifecycle): Class<LifecycleResolverStrategy> {
     switch (scope) {
       case Lifecycle.Singleton: {
         return SingletonLifecycleResolverStrategy;

@@ -1,2 +1,2 @@
-export * from './_metadata-key';
-export * from './_lifecycle';
+export { MetadataKey } from './_metadata-key';
+export { Lifecycle } from './_lifecycle';

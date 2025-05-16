@@ -1,4 +1,5 @@
-import type { InjectionToken, ResolutionErrorOptions } from '~/types';
+import type { ResolutionErrorOptions } from '~/types/error';
+import type { InjectionToken } from '~/types/token';
 
 /**
  * Dependency Resolution Error.

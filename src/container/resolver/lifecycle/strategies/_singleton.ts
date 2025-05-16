@@ -1,21 +1,16 @@
-import type { ILifecycleResolverStrategy, InjectTokenOrOptions, LifecycleResolverOptions, LifecycleResolverResolveReturn } from '~/types';
+import type { LifecycleResolveResult, LifecycleResolverStrategy, Registration, ResolutionContext } from '~/types/container';
+import type { InjectParameter } from '~/types/injector';
+import type { InjectionToken } from '~/types/token';
 
 /** Singleton Lifecycle Resolver Strategy. */
-export class SingletonLifecycleResolverStrategy implements ILifecycleResolverStrategy {
+export class SingletonLifecycleResolverStrategy implements LifecycleResolverStrategy {
   /** @inheritdoc */
-  public store<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    instance: TType,
-    options: LifecycleResolverOptions<TType, TDependencies, TInjects>,
-  ): void {
-    options.registration.instance = instance;
-  }
-
-  /** @inheritdoc */
-  public resolve<TType, TDependencies extends unknown[], TInjects extends InjectTokenOrOptions<unknown>[]>(
-    options: LifecycleResolverOptions<TType, TDependencies, TInjects>,
-  ): LifecycleResolverResolveReturn<TType> {
-    if ('instance' in options.registration) {
-      const instance = options.registration.instance;
+  public resolve<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+    _token: InjectionToken<TType>,
+    registration: Registration<TType, TDependencies, TInjectParameters>,
+  ): LifecycleResolveResult<TType> {
+    if ('instance' in registration && registration.instance !== undefined) {
+      const instance = registration.instance;
 
       return {
         isResolved: true,
@@ -26,5 +21,15 @@ export class SingletonLifecycleResolverStrategy implements ILifecycleResolverStr
     return {
       isResolved: false,
     };
+  }
+
+  /** @inheritdoc */
+  public store<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+    _token: InjectionToken<TType>,
+    registration: Registration<TType, TDependencies, TInjectParameters>,
+    _context: ResolutionContext,
+    instance: TType,
+  ): void {
+    registration.instance = instance;
   }
 }
