@@ -1,5 +1,5 @@
-import type { Class } from 'type-fest';
 import type { Lifecycle } from '~/constants';
+import type { Class } from '~/types/core';
 import type { ClassDecorator } from '~/types/decorator';
 
 import { Container } from '~/container';

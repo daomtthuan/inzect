@@ -1,6 +1,6 @@
-import type { Class } from 'type-fest';
 import type { Container } from '~/container';
 import type { ProviderResolverStrategy, ResolutionContext } from '~/types/container';
+import type { Class } from '~/types/core';
 import type { NormalizedInjectParameter } from '~/types/injector';
 import type { ClassInjectionProvider } from '~/types/provider';
 

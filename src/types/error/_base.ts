@@ -1,11 +1,9 @@
-import type { EmptyObject } from 'type-fest';
-
 /**
  * Error Options Base.
  *
  * @template TOptions Options type.
  */
-export type ErrorOptionsBase<TOptions extends object = EmptyObject> = {
+export type ErrorOptionsBase<TOptions extends object = never> = {
   /** Error cause. */
   cause?: object;
 

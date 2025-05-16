@@ -1,4 +1,4 @@
-import type { Class } from 'type-fest';
+import type { Class } from '~/types/core';
 import type { ClassDecorator, ClassFieldDecorator, InjectResult } from '~/types/decorator';
 import type { InjectParameter } from '~/types/injector';
 import type { InjectionToken } from '~/types/token';

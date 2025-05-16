@@ -1,11 +1,4 @@
-import type { AbstractClass, Class } from 'type-fest';
-
-/**
- * Decorated Class.
- *
- * @internal
- */
-export type DecoratedClass = Class<unknown> | AbstractClass<unknown>;
+import type { ClassType } from '~/types/core';
 
 /**
  * Class decorator.
@@ -15,7 +8,7 @@ export type DecoratedClass = Class<unknown> | AbstractClass<unknown>;
  * @param target Target class.
  * @param context Class decorator Context.
  */
-export type ClassDecorator<TTarget extends DecoratedClass, TDecorate extends DecoratedClass = TTarget> = (
+export type ClassDecorator<TTarget extends ClassType<unknown>, TDecorate extends ClassType<unknown> = TTarget> = (
   target: TTarget,
   context: ClassDecoratorContext,
 ) => TDecorate | void;

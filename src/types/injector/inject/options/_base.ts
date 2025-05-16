@@ -1,4 +1,3 @@
-import type { EmptyObject } from 'type-fest';
 import type { InjectionToken } from '~/types/token';
 
 /**
@@ -7,7 +6,7 @@ import type { InjectionToken } from '~/types/token';
  * @template TType Type of instance.
  * @template TOptions Options type.
  */
-export type InjectOptionsBase<TType, TOptions extends object = EmptyObject> = {
+export type InjectOptionsBase<TType, TOptions extends object = never> = {
   /** Injection Token. */
   token: InjectionToken<TType>;
 } & TOptions;

@@ -1,5 +1,5 @@
-import type { Class } from 'type-fest';
 import type { LifecycleResolverStrategy } from '~/types/container';
+import type { Class } from '~/types/core';
 
 import { Lifecycle } from '~/constants';
 import { ArgumentError } from '~/errors';

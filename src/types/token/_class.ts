@@ -1,8 +1,8 @@
-import type { AbstractClass, Class } from 'type-fest';
+import type { ClassType } from '~/types/core';
 
 /**
  * Class Injection Token.
  *
  * @template TType Type of instance.
  */
-export type ClassInjectionToken<TType> = Class<TType> | AbstractClass<TType>;
+export type ClassInjectionToken<TType> = ClassType<TType>;

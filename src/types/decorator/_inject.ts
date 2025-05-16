@@ -1,4 +1,4 @@
-import type { Class } from 'type-fest';
+import type { Class } from '~/types/core';
 import type { ClassDecorator, ClassFieldDecorator } from '~/types/decorator';
 
 /**

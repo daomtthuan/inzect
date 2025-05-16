@@ -1,4 +1,4 @@
-import type { Class, Primitive } from 'type-fest';
+import type { Class, Primitive } from '~/types/core';
 
 /** Helper for Data Type. */
 export class TypeHelper {
