@@ -5,10 +5,8 @@
     "type": "nodenext",
     "resolveFully": true
   },
-  "env": {
-    "coreJs": "3.42.0"
-  },
   "jsc": {
+    "target": "esnext",
     "parser": {
       "syntax": "typescript",
       "tsx": false,
