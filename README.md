@@ -314,7 +314,6 @@ Resolves a dependency.
 
 - `token` — Injection Token (see [Token](#token)).
 - `optional` (**default**: `false`) — Whether the dependency is optional.
-- `context` — Resolution context. Leave empty to use the default context for resolving dependencies.
 
 ##### Usage
 

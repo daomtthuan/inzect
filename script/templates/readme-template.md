@@ -21,6 +21,7 @@
     - [`container.isRegistered()`](#containerisregistered)
     - [`container.clear()`](#containerclear)
     - [`container.resolve()`](#containerresolve)
+    - [`container.createChild()`](#containercreatechild)
   - [Injection](#injection)
     - [Token](#token)
     - [Provider](#provider)
@@ -78,12 +79,12 @@ on the constructors of decorated classes.
 Marks a class as available for dependency injection.
 Use this decorator to register a class as a provider that can be injected into other classes.
 
-##### Options
+**Options**
 
 - `token` — Injection Token (see [Token](#token)). Leave empty to use the `class` as the token.
 - `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
-##### Usage
+**Usage**
 
 ```ts
 // logger-service.ts
@@ -102,20 +103,14 @@ __[EXAMPLE](/examples/decorators/injectable/index.ts)__
 Specifies a dependency to be injected.
 Use this decorator to inject into class fields or class properties. Or use this decorator to inject into constructor parameters.
 
-##### Options
-
 1. Inject into class fields or class properties.
+
+   **Options**
 
    - `token` — Injection Token (see [Token](#token)).
    - `optional` (**default**: `false`) — Whether the dependency is optional.
 
-2. Inject into constructor parameters.
-
-   - `injects` — List of `Inject Parameter`.
-
-##### Usage
-
-1. Inject into class fields or class properties.
+   **Usage**
 
    ```ts
    // app.ts
@@ -124,6 +119,12 @@ Use this decorator to inject into class fields or class properties. Or use this 
    ```
 
 2. Inject into constructor parameters.
+
+   **Options**
+
+   - `injects` — List of `Inject Parameter`.
+
+   **Usage**
 
    ```ts
    // app.ts
@@ -136,11 +137,11 @@ Use this decorator to inject into class fields or class properties. Or use this 
 Defines the lifecycle scope of a provider.
 Use this decorator to control how and when instances are created.
 
-##### Options
+**Options**
 
 - `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
-##### Usage
+**Usage**
 
 ```ts
 // database.ts
@@ -163,13 +164,13 @@ As a result, **you must explicitly specify the token to inject in most cases**, 
 
 Registers a provider with the container.
 
-##### Options
+**Options**
 
 - `token` — Injection Token (see [Token](#token)).
 - `provider` — Injection Provider (see [Provider](#provider)).
 - `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -181,11 +182,11 @@ __[EXAMPLE](/examples/container/register.ts)__
 
 Unregister a dependency.
 
-##### Options
+**Options**
 
 - `token` — Injection Token (see [Token](#token)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -197,11 +198,11 @@ __[EXAMPLE](/examples/container/unregister.ts)__
 
 Check if a dependency is registered.
 
-##### Options
+**Options**
 
 - `token` — Injection Token (see [Token](#token)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -213,7 +214,7 @@ __[EXAMPLE](/examples/container/is-registered.ts)__
 
 Clears all registered dependencies.
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -225,18 +226,38 @@ __[EXAMPLE](/examples/container/clear.ts)__
 
 Resolves a dependency.
 
-##### Options
+**Options**
 
 - `token` — Injection Token (see [Token](#token)).
 - `optional` (**default**: `false`) — Whether the dependency is optional.
-- `context` — Resolution context. Leave empty to use the default context for resolving dependencies.
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
 
 __[EXAMPLE](/examples/container/resolve.ts)__
+```
+
+#### `container.createChild()`
+
+Creates a child container that shares access to the registrations of its parent.\
+When resolving a dependency in the child container, if the token is not registered locally, the lookup will fall back to the parent container.
+
+**Usage**
+
+```ts
+// index.ts
+
+__[EXAMPLE](/examples/container/child.ts)__
+```
+
+Sharing access to the registrations of its parent
+
+```ts
+// index.ts
+
+__[EXAMPLE](/examples/container/child-inherit.ts)__
 ```
 
 ### Injection
@@ -256,11 +277,11 @@ Such tokens can be:
 
 A **class injection provider** is used to provide an instance of a class.
 
-###### Options
+**Options**
 
 - `useClass` — Class to provide.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -272,11 +293,11 @@ __[EXAMPLE](/examples/container/provider/class.ts)__
 
 A **value injection provider** is used to provide a value.
 
-###### Options
+**Options**
 
 - `useValue` — Value to provide.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -288,11 +309,11 @@ __[EXAMPLE](/examples/container/provider/value.ts)__
 
 A **factory injection provider** is used to provide an instance using a factory function.
 
-###### Options
+**Options**
 
 - `useFactory` — Factory function.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -304,37 +325,37 @@ __[EXAMPLE](/examples/container/provider/factory.ts)__
 
 The **lifecycle scope** of a provider defines how and when instances are created.
 
-##### Options
+**Options**
 
 - `Singleton` — One shared instance across the entire application.
 - `Transient` — A new instance is created every time the provider is injected.
 - `Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that graph.
 
-##### Usage
+**Usage**
 
-###### Singleton Scope
+1. Singleton Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-__[EXAMPLE](/examples/container/scope/singleton.ts)__
-```
+   __[EXAMPLE](/examples/container/scope/singleton.ts)__
+   ```
 
-###### Transient Scope
+2. Transient Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-__[EXAMPLE](/examples/container/scope/transient.ts)__
-```
+   __[EXAMPLE](/examples/container/scope/transient.ts)__
+   ```
 
-###### Resolution Scope
+3. Resolution Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-__[EXAMPLE](/examples/container/scope/resolution.ts)__
-```
+   __[EXAMPLE](/examples/container/scope/resolution.ts)__
+   ```
 
 ## 🧪 Planned Features
 

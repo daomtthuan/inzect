@@ -1,24 +1,18 @@
 import ChildProcess from 'child_process';
 import FS from 'fs';
+import { Inject, Lifecycle, Scope } from 'inzect';
 import Path from 'path';
-import { Lifecycle } from '~/constants';
-import { Inject, Scope } from '~/decorators';
 import { ScriptBase } from './_base';
-import LintScript from './lint';
 import ReadmeScript from './readme';
 
 /** Build script. */
 @Scope(Lifecycle.Singleton)
 export class BuildScript extends ScriptBase {
-  @Inject(LintScript)
-  readonly #lintScript!: LintScript;
   @Inject(ReadmeScript)
   readonly #readmeScript!: ReadmeScript;
 
   /** @inheritdoc */
   public run(): void {
-    this.#lintScript.run();
-
     this.#cleanBuildDir();
 
     this.#build();

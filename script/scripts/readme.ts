@@ -1,7 +1,6 @@
 import FS from 'fs';
+import { Lifecycle, Scope } from 'inzect';
 import Path from 'path';
-import { Lifecycle } from '~/constants';
-import { Scope } from '~/decorators';
 import { ScriptBase } from './_base';
 
 /** Readme script. */

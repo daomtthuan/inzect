@@ -80,7 +80,8 @@
     "**/.svn": true,
     "**/CVS": true,
     "**/release": true,
-    "**/Thumbs.db": true
+    "**/Thumbs.db": true,
+    "**/node_modules": true
   },
   "files.readonlyInclude": {
     "**/dist": true,
@@ -99,7 +100,8 @@
     "default": true,
     "MD024": {
       "siblings_only": true
-    }
+    },
+    "MD036": false
   },
   "material-icon-theme.activeIconPack": "none",
   "material-icon-theme.folders.associations": {

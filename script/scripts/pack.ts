@@ -1,6 +1,5 @@
 import ChildProcess from 'child_process';
-import { Lifecycle } from '~/constants';
-import { Inject, Scope } from '~/decorators';
+import { Inject, Lifecycle, Scope } from 'inzect';
 import { ScriptBase } from './_base';
 import { BuildScript } from './build';
 

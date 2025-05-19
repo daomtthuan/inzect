@@ -1,6 +1,5 @@
 import ChildProcess from 'child_process';
-import { Lifecycle } from '~/constants';
-import { Scope } from '~/decorators';
+import { Lifecycle, Scope } from 'inzect';
 import { ScriptBase } from './_base';
 
 /** Playground script. */

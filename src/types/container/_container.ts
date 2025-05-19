@@ -1,6 +1,5 @@
 import type { InjectParameter } from '~/types/injector';
 import type { InjectionToken } from '~/types/token';
-import type { ResolutionContext } from './context';
 import type { ClassRegisterOptions, FactoryRegisterOptions, ValueRegisterOptions } from './registry';
 
 /** Dependency Injection Container. */
@@ -61,11 +60,10 @@ export interface DependencyInjectionContainer {
    * @template TType Type of instance to resolve.
    * @param token Injection Token.
    * @param optional If `true`, returns `undefined` if the token is not registered.
-   * @param context Resolution context.
    *
    * @returns Resolved instance.
    */
-  resolve<TType>(token: InjectionToken<TType>, optional?: false, context?: ResolutionContext): TType;
+  resolve<TType>(token: InjectionToken<TType>, optional?: false): TType;
   /**
    * Optional Resolves a dependency.\
    * Return `undefined` if the token is not registered.
@@ -74,9 +72,15 @@ export interface DependencyInjectionContainer {
    * @template TType Type of instance to resolve.
    * @param token Injection Token.
    * @param optional If `true`, returns `undefined` if the token is not registered.
-   * @param context Resolution context.
    *
    * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
    */
-  resolve<TType>(token: InjectionToken<TType>, optional: true, context?: ResolutionContext): TType | undefined;
+  resolve<TType>(token: InjectionToken<TType>, optional: true): TType | undefined;
+
+  /**
+   * Create a child container.
+   *
+   * @returns Child container.
+   */
+  createChild(): DependencyInjectionContainer;
 }
