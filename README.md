@@ -145,7 +145,7 @@ Use this decorator to inject into class fields or class properties. Or use this 
 
    **Parameters**
 
-   - `injects` — List of `Inject Parameter`.
+   - `injects` — List of `Inject Parameter`. Inject parameters are used to inject dependencies into the constructor.
 
    **Usage**
 
@@ -472,6 +472,7 @@ A **factory injection provider** is used to provide an instance using a factory 
 **Properties**
 
 - `useFactory` — Factory function.
+- `inject` — List of `Inject Parameter`. Inject parameters are used to inject dependencies into the factory function.
 
 **Usage**
 
