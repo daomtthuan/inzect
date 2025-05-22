@@ -21,15 +21,15 @@
     - [`container.isRegistered()`](#containerisregistered)
     - [`container.clear()`](#containerclear)
     - [`container.resolve()`](#containerresolve)
+    - [`container.createChild()`](#containercreatechild)
   - [Injection](#injection)
     - [Token](#token)
     - [Provider](#provider)
-    - [Lifecycle](#lifecycle)
+    - [Lifecycle Scope](#lifecycle-scope)
 - [🧪 Planned Features](#-planned-features)
   - [Circular Dependencies](#circular-dependencies)
   - [Disposable Instances](#disposable-instances)
   - [Interception](#interception)
-  - [Child Container](#child-container)
 - [📄 License](#-license)
 - [🤝 Contributing](#-contributing)
 
@@ -53,13 +53,16 @@ yarn add inzect
 pnpm add inzect
 ```
 
-**Inzect is built upon the [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators).**
-Please ensure that your `tsconfig.json` is configured to support Stage 3 decorators.
+**Inzect is built upon the [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.\
+Please ensure that your `tsconfig.json` is configured to support Stage 3 decorators.\
 Specifically, **do not enable** `experimentalDecorators` or `emitDecoratorMetadata`, or simply omit them from the configuration:
 
 ```json
+// tsconfig.json
+
 {
   "compilerOptions": {
+    // ...
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false
   }
@@ -78,12 +81,12 @@ on the constructors of decorated classes.
 Marks a class as available for dependency injection.
 Use this decorator to register a class as a provider that can be injected into other classes.
 
-##### Options
+**Parameters**
 
-- `token` — Injection Token (see [Token](#token)). Leave empty to use the `class` as the token.
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `token` — Injection Token (see [Token](#token)). Leave empty to use the decorated `class` as the token.
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
-##### Usage
+**Usage**
 
 ```ts
 // logger-service.ts
@@ -113,20 +116,14 @@ logger.log('Hello world!');
 Specifies a dependency to be injected.
 Use this decorator to inject into class fields or class properties. Or use this decorator to inject into constructor parameters.
 
-##### Options
-
 1. Inject into class fields or class properties.
+
+   **Parameters**
 
    - `token` — Injection Token (see [Token](#token)).
    - `optional` (**default**: `false`) — Whether the dependency is optional.
 
-2. Inject into constructor parameters.
-
-   - `injects` — List of `Inject Parameter`.
-
-##### Usage
-
-1. Inject into class fields or class properties.
+   **Usage**
 
    ```ts
    // app.ts
@@ -145,6 +142,12 @@ Use this decorator to inject into class fields or class properties. Or use this 
    ```
 
 2. Inject into constructor parameters.
+
+   **Parameters**
+
+   - `injects` — List of `Inject Parameter`.
+
+   **Usage**
 
    ```ts
    // app.ts
@@ -171,11 +174,11 @@ Use this decorator to inject into class fields or class properties. Or use this 
 Defines the lifecycle scope of a provider.
 Use this decorator to control how and when instances are created.
 
-##### Options
+**Parameters**
 
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
-##### Usage
+**Usage**
 
 ```ts
 // database.ts
@@ -192,26 +195,26 @@ export class Database {
 
 ### Container
 
-The `Container` is the core of the **Inzect** dependency injection system. It manages provider registration, resolution, and instance lifecycle.
+The `Container` is the core of the **Inzect** dependency injection system. It manages provider registration, resolution, and instance lifecycle.\
 The general principle behind [Inversion of Control (IoC)](https://en.wikipedia.org/wiki/Inversion_of_control) containers is:
 **you give the container a token, and in exchange you get an instance or value**.
 
 **Inzect** adheres to the [Stage 3 Decorators](https://github.com/tc39/proposal-decorators) specification of ECMAScript.
 Unlike legacy decorators, **Stage 3 does not support `emitDecoratorMetadata`**, which means the container **cannot infer types** from TypeScript metadata.
 
-As a result, **you must explicitly specify the token to inject in most cases**, using the `@Inject()` to decorate (see [Inject](#inject)).
+Therefore, **you must explicitly specify the token to inject in most cases**, using the `@Inject()` to decorate (see [Inject](#inject)).
 
 #### `container.register()`
 
 Registers a provider with the container.
 
-##### Options
+**Parameters**
 
-- `token` — Injection Token (see [Token](#token)).
-- `provider` — Injection Provider (see [Provider](#provider)).
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `options.token` — Injection Token (see [Token](#token)).
+- `options.provider` — Injection Provider (see [Provider](#provider)).
+- `options.scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -232,11 +235,11 @@ container.register({
 
 Unregister a dependency.
 
-##### Options
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -260,13 +263,14 @@ console.log(container.isRegistered(Service)); // false
 
 #### `container.isRegistered()`
 
-Check if a dependency is registered.
+Check if a dependency is registered.\
+It only checks the current container, not the parent containers.
 
-##### Options
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -283,8 +287,9 @@ console.log(container.isRegistered('some-token')); // false
 #### `container.clear()`
 
 Clears all registered dependencies.
+It only clears the current container, not the parent containers.
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -310,12 +315,12 @@ console.log(container.isRegistered(Service)); // false
 
 Resolves a dependency.
 
-##### Options
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 - `optional` (**default**: `false`) — Whether the dependency is optional.
 
-##### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -336,6 +341,70 @@ const logger = container.resolve<Logger>(LOGGER_TOKEN);
 logger.log('Hello world!');
 ```
 
+#### `container.createChild()`
+
+Creates a child container that shares access to the registrations of its parent.\
+When resolving a dependency in the child container, if the token is not registered locally, the lookup will fall back to the parent container.
+
+**Usage**
+
+```ts
+// index.ts
+
+import { container, Lifecycle } from 'inzect';
+
+class Service {}
+
+const childContainer1 = container.createChild();
+childContainer1.register({
+  token: 'Service',
+  provider: {
+    useClass: Service,
+  },
+  scope: Lifecycle.Singleton,
+});
+
+const childContainer2 = container.createChild();
+childContainer2.register({
+  token: 'Service',
+  provider: {
+    useClass: Service,
+  },
+  scope: Lifecycle.Singleton,
+});
+
+const service1 = childContainer1.resolve('Service');
+const service2 = childContainer2.resolve('Service');
+
+console.log(service1 === service2); // false
+```
+
+Sharing access to the registrations of its parent
+
+```ts
+// index.ts
+
+import { container, Lifecycle } from 'inzect';
+
+class Service {}
+
+container.register({
+  token: 'Service',
+  provider: {
+    useClass: Service,
+  },
+  scope: Lifecycle.Singleton,
+});
+
+const childContainer1 = container.createChild();
+const childContainer2 = container.createChild();
+
+const service1 = childContainer1.resolve('Service');
+const service2 = childContainer2.resolve('Service');
+
+console.log(service1 === service2); // true
+```
+
 ### Injection
 
 #### Token
@@ -353,11 +422,11 @@ Such tokens can be:
 
 A **class injection provider** is used to provide an instance of a class.
 
-###### Options
+**Properties**
 
 - `useClass` — Class to provide.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -377,11 +446,11 @@ container.register({
 
 A **value injection provider** is used to provide a value.
 
-###### Options
+**Properties**
 
 - `useValue` — Value to provide.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -400,11 +469,11 @@ container.register({
 
 A **factory injection provider** is used to provide an instance using a factory function.
 
-###### Options
+**Properties**
 
 - `useFactory` — Factory function.
 
-###### Usage
+**Usage**
 
 ```ts
 // index.ts
@@ -434,78 +503,105 @@ container.register({
 });
 ```
 
-#### Lifecycle
+#### Lifecycle Scope
 
-The **lifecycle scope** of a provider defines how and when instances are created.
+The **lifecycle scope** of a provider defines how and when instances are created and reused.
 
-##### Options
+**Values**
 
-- `Singleton` — One shared instance across the entire application.
-- `Transient` — A new instance is created every time the provider is injected.
-- `Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that graph.
+- `Lifecycle.Singleton` — One shared instance across the entire application.
+- `Lifecycle.Transient` — A new instance is created every time the provider is injected.
+- `Lifecycle.Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that resolution graph.
+- `Lifecycle.Container` — A new instance is created per container (i.e. per `container.createChild()` call), and reused within that container itself.
 
-##### Usage
+**Usage**
 
-###### Singleton Scope
+1. Singleton Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-import { container, Lifecycle, Scope } from 'inzect';
+   import { container, Lifecycle, Scope } from 'inzect';
 
-@Scope(Lifecycle.Singleton)
-class Service {}
+   @Scope(Lifecycle.Singleton)
+   class Service {}
 
-const service1 = container.resolve(Service);
-const service2 = container.resolve(Service);
+   const service1 = container.resolve(Service);
+   const service2 = container.resolve(Service);
 
-console.log(service1 === service2); // true
-```
+   console.log(service1 === service2); // true
+   ```
 
-###### Transient Scope
+2. Transient Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-import { container, Lifecycle, Scope } from 'inzect';
+   import { container, Lifecycle, Scope } from 'inzect';
 
-@Scope(Lifecycle.Transient)
-class Service {}
+   @Scope(Lifecycle.Transient)
+   class Service {}
 
-const service1 = container.resolve(Service);
-const service2 = container.resolve(Service);
+   const service1 = container.resolve(Service);
+   const service2 = container.resolve(Service);
 
-console.log(service1 === service2); // false
-```
+   console.log(service1 === service2); // false
+   ```
 
-###### Resolution Scope
+3. Resolution Scope
 
-```ts
-// index.ts
+   ```ts
+   // index.ts
 
-import { container, Inject, Lifecycle, Scope } from 'inzect';
+   import { container, Inject, Lifecycle, Scope } from 'inzect';
 
-@Scope(Lifecycle.Resolution)
-class Service {}
+   @Scope(Lifecycle.Resolution)
+   class Service {}
 
-@Inject([Service])
-class App {
-  @Inject(Service)
-  readonly #service1!: Service;
-  readonly #service2: Service;
+   @Inject([Service])
+   class App {
+     @Inject(Service)
+     readonly #service1!: Service;
+     readonly #service2: Service;
 
-  public constructor(service2: Service) {
-    this.#service2 = service2;
-  }
+     public constructor(service2: Service) {
+       this.#service2 = service2;
+     }
 
-  run(): void {
-    console.log(this.#service1 === this.#service2); // true
-  }
-}
+     run(): void {
+       console.log(this.#service1 === this.#service2); // true
+     }
+   }
 
-const app = container.resolve(App);
-app.run();
-```
+   const app = container.resolve(App);
+   app.run();
+   ```
+
+4. Container Scope
+
+   ```ts
+   // index.ts
+
+   import { container, Lifecycle } from 'inzect';
+
+   class Service {}
+
+   container.register({
+     token: 'Service',
+     provider: {
+       useClass: Service,
+     },
+     scope: Lifecycle.Container,
+   });
+
+   const childContainer = container.createChild();
+
+   try {
+     childContainer.resolve('Service');
+   } catch (error) {
+     // It will throw an error because the scope is Container, childContainer can't resolve Service that is registered in global container
+   }
+   ```
 
 ## 🧪 Planned Features
 
@@ -534,15 +630,6 @@ It provides two main hooks:
 - `afterResolution` – called after the instance is resolved
 
 This is useful for logging, metrics, and debugging.
-
-### Child Container
-
-This allows the creation of **child container**, which:
-
-- Inherit all registrations from parent container
-- Adds a new scope `Scope.Container` — resolves dependencies **only** within the current container.
-
-This is useful for per-request, per-session, or test-isolated.
 
 ## 📄 License
 
