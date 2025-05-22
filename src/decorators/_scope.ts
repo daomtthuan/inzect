@@ -15,7 +15,7 @@ import { Container } from '~/container';
  */
 export function Scope<TTarget extends Class<unknown>>(scope: Lifecycle): ClassDecorator<TTarget> {
   return (target) => {
-    Container._instance.register({
+    Container.instance.register({
       token: target,
       provider: {
         useClass: target,

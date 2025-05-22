@@ -22,7 +22,7 @@ export class FactoryProviderResolverStrategy implements ProviderResolverStrategy
     const dependencies: TDependencies = (provider.inject?.map((inject) => {
       const { token, optional } = InjectorHelper.normalizeInjectParameter(inject);
 
-      return this.#container._resolveWithContext(token, optional, context);
+      return this.#container.resolveWithContext(token, optional, context);
     }) ?? []) as TDependencies;
 
     return provider.useFactory(...dependencies);

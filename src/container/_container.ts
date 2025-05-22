@@ -1,4 +1,12 @@
-import type { DependencyInjectionContainer, RegisterParameter, Registration, ResolutionContext } from '~/types/container';
+import type {
+  ClassRegisterOptions,
+  DependencyInjectionContainer,
+  FactoryRegisterOptions,
+  RegisterParameter,
+  Registration,
+  ResolutionContext,
+  ValueRegisterOptions,
+} from '~/types/container';
 import type { InjectParameter } from '~/types/injector';
 import type { InjectionToken } from '~/types/token';
 
@@ -35,6 +43,19 @@ export class Container implements DependencyInjectionContainer {
   }
 
   /** @inheritdoc */
+  public createChild(): DependencyInjectionContainer {
+    return new Container(this);
+  }
+
+  /** @inheritdoc */
+  public register<TType>(options: ClassRegisterOptions<TType>): void;
+  /** @inheritdoc */
+  public register<TType>(options: ValueRegisterOptions<TType>): void;
+  /** @inheritdoc */
+  public register<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+    options: FactoryRegisterOptions<TType, TDependencies, TInjectParameters>,
+  ): void;
+  /** @inheritdoc */
   public register<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>({
     token,
     provider,
@@ -44,15 +65,6 @@ export class Container implements DependencyInjectionContainer {
       provider: provider,
       scope,
     });
-  }
-
-  /** @inheritdoc */
-  public resolve<TType>(token: InjectionToken<TType>, optional: boolean = false): TType | undefined {
-    try {
-      return this._resolveWithContext(token, optional);
-    } finally {
-      this.#context.clearInstances();
-    }
   }
 
   /** @inheritdoc */
@@ -71,12 +83,20 @@ export class Container implements DependencyInjectionContainer {
   }
 
   /** @inheritdoc */
-  public createChild(): DependencyInjectionContainer {
-    return new Container(this);
+  public resolve<TType>(token: InjectionToken<TType>, optional?: false): TType;
+  /** @inheritdoc */
+  public resolve<TType>(token: InjectionToken<TType>, optional: true): TType | undefined;
+  /** @inheritdoc */
+  public resolve<TType>(token: InjectionToken<TType>, optional: boolean = false): TType | undefined {
+    try {
+      return this.resolveWithContext(token, optional);
+    } finally {
+      this.#context.clearInstances();
+    }
   }
 
   /**
-   * Resolve with internal context.
+   * Resolve with context.
    *
    * @param token Injection Token.
    * @param optional If `true`, returns `undefined` if the token is not registered.
@@ -85,8 +105,8 @@ export class Container implements DependencyInjectionContainer {
    * @returns Resolved instance.
    * @internal
    */
-  public _resolveWithContext<TType>(token: InjectionToken<TType>, optional: boolean, context: ResolutionContext = this.#context): TType | undefined {
-    const registration = this._lookupRegistration(token);
+  public resolveWithContext<TType>(token: InjectionToken<TType>, optional: boolean, context: ResolutionContext = this.#context): TType | undefined {
+    const registration = this.lookupRegistration(token);
     if (!registration) {
       return this.#resolver.resolveUnregistered(token, optional, context);
     }
@@ -102,7 +122,7 @@ export class Container implements DependencyInjectionContainer {
    * @returns Registration.
    * @internal
    */
-  private _lookupRegistration<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
+  private lookupRegistration<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]>(
     token: InjectionToken<TType>,
   ): Registration<TType, TDependencies, TInjectParameters> | undefined {
     const registration = this.#registry.get<TType, TDependencies, TInjectParameters>(token);
@@ -110,14 +130,19 @@ export class Container implements DependencyInjectionContainer {
       return registration;
     }
 
-    return this.#parent?._lookupRegistration(token);
+    const parentRegistration = this.#parent?.lookupRegistration<TType, TDependencies, TInjectParameters>(token);
+    if (parentRegistration && parentRegistration.scope === Lifecycle.Container) {
+      return undefined;
+    }
+
+    return parentRegistration;
   }
 
   /**
    * @returns Static Instance of Container.
    * @internal
    */
-  public static get _instance(): Container {
+  public static get instance(): Container {
     Container.#instance ??= new Container();
     return Container.#instance;
   }

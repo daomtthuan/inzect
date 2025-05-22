@@ -20,7 +20,7 @@ export function Injectable<TTarget extends Class<unknown>, TType>(
   scope: Lifecycle = Lifecycle.Transient,
 ): ClassDecorator<TTarget> {
   return (target) => {
-    Container._instance.register({
+    Container.instance.register({
       token: token ?? target,
       provider: {
         useClass: target,

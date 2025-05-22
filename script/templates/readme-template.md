@@ -25,12 +25,11 @@
   - [Injection](#injection)
     - [Token](#token)
     - [Provider](#provider)
-    - [Lifecycle](#lifecycle)
+    - [Lifecycle Scope](#lifecycle-scope)
 - [🧪 Planned Features](#-planned-features)
   - [Circular Dependencies](#circular-dependencies)
   - [Disposable Instances](#disposable-instances)
   - [Interception](#interception)
-  - [Child Container](#child-container)
 - [📄 License](#-license)
 - [🤝 Contributing](#-contributing)
 
@@ -54,13 +53,16 @@ yarn add inzect
 pnpm add inzect
 ```
 
-**Inzect is built upon the [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators).**
-Please ensure that your `tsconfig.json` is configured to support Stage 3 decorators.
+**Inzect is built upon the [Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.\
+Please ensure that your `tsconfig.json` is configured to support Stage 3 decorators.\
 Specifically, **do not enable** `experimentalDecorators` or `emitDecoratorMetadata`, or simply omit them from the configuration:
 
 ```json
+// tsconfig.json
+
 {
   "compilerOptions": {
+    // ...
     "experimentalDecorators": false,
     "emitDecoratorMetadata": false
   }
@@ -79,10 +81,10 @@ on the constructors of decorated classes.
 Marks a class as available for dependency injection.
 Use this decorator to register a class as a provider that can be injected into other classes.
 
-**Options**
+**Parameters**
 
-- `token` — Injection Token (see [Token](#token)). Leave empty to use the `class` as the token.
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `token` — Injection Token (see [Token](#token)). Leave empty to use the decorated `class` as the token.
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
 **Usage**
 
@@ -105,7 +107,7 @@ Use this decorator to inject into class fields or class properties. Or use this 
 
 1. Inject into class fields or class properties.
 
-   **Options**
+   **Parameters**
 
    - `token` — Injection Token (see [Token](#token)).
    - `optional` (**default**: `false`) — Whether the dependency is optional.
@@ -120,7 +122,7 @@ Use this decorator to inject into class fields or class properties. Or use this 
 
 2. Inject into constructor parameters.
 
-   **Options**
+   **Parameters**
 
    - `injects` — List of `Inject Parameter`.
 
@@ -137,9 +139,9 @@ Use this decorator to inject into class fields or class properties. Or use this 
 Defines the lifecycle scope of a provider.
 Use this decorator to control how and when instances are created.
 
-**Options**
+**Parameters**
 
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
 **Usage**
 
@@ -151,24 +153,24 @@ __[EXAMPLE](/examples/modules/database.ts)__
 
 ### Container
 
-The `Container` is the core of the **Inzect** dependency injection system. It manages provider registration, resolution, and instance lifecycle.
+The `Container` is the core of the **Inzect** dependency injection system. It manages provider registration, resolution, and instance lifecycle.\
 The general principle behind [Inversion of Control (IoC)](https://en.wikipedia.org/wiki/Inversion_of_control) containers is:
 **you give the container a token, and in exchange you get an instance or value**.
 
 **Inzect** adheres to the [Stage 3 Decorators](https://github.com/tc39/proposal-decorators) specification of ECMAScript.
 Unlike legacy decorators, **Stage 3 does not support `emitDecoratorMetadata`**, which means the container **cannot infer types** from TypeScript metadata.
 
-As a result, **you must explicitly specify the token to inject in most cases**, using the `@Inject()` to decorate (see [Inject](#inject)).
+Therefore, **you must explicitly specify the token to inject in most cases**, using the `@Inject()` to decorate (see [Inject](#inject)).
 
 #### `container.register()`
 
 Registers a provider with the container.
 
-**Options**
+**Parameters**
 
-- `token` — Injection Token (see [Token](#token)).
-- `provider` — Injection Provider (see [Provider](#provider)).
-- `scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle](#lifecycle)).
+- `options.token` — Injection Token (see [Token](#token)).
+- `options.provider` — Injection Provider (see [Provider](#provider)).
+- `options.scope` (**default**: `Lifecycle.Transient`) — Lifecycle scope (see [Lifecycle Scope](#lifecycle-scope)).
 
 **Usage**
 
@@ -182,7 +184,7 @@ __[EXAMPLE](/examples/container/register.ts)__
 
 Unregister a dependency.
 
-**Options**
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 
@@ -196,9 +198,10 @@ __[EXAMPLE](/examples/container/unregister.ts)__
 
 #### `container.isRegistered()`
 
-Check if a dependency is registered.
+Check if a dependency is registered.\
+It only checks the current container, not the parent containers.
 
-**Options**
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 
@@ -213,6 +216,7 @@ __[EXAMPLE](/examples/container/is-registered.ts)__
 #### `container.clear()`
 
 Clears all registered dependencies.
+It only clears the current container, not the parent containers.
 
 **Usage**
 
@@ -226,7 +230,7 @@ __[EXAMPLE](/examples/container/clear.ts)__
 
 Resolves a dependency.
 
-**Options**
+**Parameters**
 
 - `token` — Injection Token (see [Token](#token)).
 - `optional` (**default**: `false`) — Whether the dependency is optional.
@@ -277,7 +281,7 @@ Such tokens can be:
 
 A **class injection provider** is used to provide an instance of a class.
 
-**Options**
+**Properties**
 
 - `useClass` — Class to provide.
 
@@ -293,7 +297,7 @@ __[EXAMPLE](/examples/container/provider/class.ts)__
 
 A **value injection provider** is used to provide a value.
 
-**Options**
+**Properties**
 
 - `useValue` — Value to provide.
 
@@ -309,7 +313,7 @@ __[EXAMPLE](/examples/container/provider/value.ts)__
 
 A **factory injection provider** is used to provide an instance using a factory function.
 
-**Options**
+**Properties**
 
 - `useFactory` — Factory function.
 
@@ -321,15 +325,16 @@ A **factory injection provider** is used to provide an instance using a factory 
 __[EXAMPLE](/examples/container/provider/factory.ts)__
 ```
 
-#### Lifecycle
+#### Lifecycle Scope
 
-The **lifecycle scope** of a provider defines how and when instances are created.
+The **lifecycle scope** of a provider defines how and when instances are created and reused.
 
-**Options**
+**Values**
 
-- `Singleton` — One shared instance across the entire application.
-- `Transient` — A new instance is created every time the provider is injected.
-- `Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that graph.
+- `Lifecycle.Singleton` — One shared instance across the entire application.
+- `Lifecycle.Transient` — A new instance is created every time the provider is injected.
+- `Lifecycle.Resolution` — A new instance is created per resolution graph (i.e. per `container.resolve()` call), and reused within that resolution graph.
+- `Lifecycle.Container` — A new instance is created per container (i.e. per `container.createChild()` call), and reused within that container itself.
 
 **Usage**
 
@@ -355,6 +360,14 @@ The **lifecycle scope** of a provider defines how and when instances are created
    // index.ts
 
    __[EXAMPLE](/examples/container/scope/resolution.ts)__
+   ```
+
+4. Container Scope
+
+   ```ts
+   // index.ts
+
+   __[EXAMPLE](/examples/container/scope/container.ts)__
    ```
 
 ## 🧪 Planned Features
@@ -384,15 +397,6 @@ It provides two main hooks:
 - `afterResolution` – called after the instance is resolved
 
 This is useful for logging, metrics, and debugging.
-
-### Child Container
-
-This allows the creation of **child container**, which:
-
-- Inherit all registrations from parent container
-- Adds a new scope `Scope.Container` — resolves dependencies **only** within the current container.
-
-This is useful for per-request, per-session, or test-isolated.
 
 ## 📄 License
 

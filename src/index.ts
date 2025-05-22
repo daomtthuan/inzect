@@ -5,7 +5,7 @@ import type { DependencyInjectionContainer } from './types/container';
 import { Container } from './container';
 
 /** Global Dependency Injection Container. */
-export const container = Container._instance as DependencyInjectionContainer;
+export const container: DependencyInjectionContainer = Container.instance;
 
 export type {
   ClassRegisterOptions,

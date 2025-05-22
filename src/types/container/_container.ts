@@ -5,6 +5,13 @@ import type { ClassRegisterOptions, FactoryRegisterOptions, ValueRegisterOptions
 /** Dependency Injection Container. */
 export interface DependencyInjectionContainer {
   /**
+   * Create a child container.
+   *
+   * @returns Child container.
+   */
+  createChild(): DependencyInjectionContainer;
+
+  /**
    * Register a dependency with {@link ClassInjectionProvider}
    *
    * @overload
@@ -76,11 +83,4 @@ export interface DependencyInjectionContainer {
    * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
    */
   resolve<TType>(token: InjectionToken<TType>, optional: true): TType | undefined;
-
-  /**
-   * Create a child container.
-   *
-   * @returns Child container.
-   */
-  createChild(): DependencyInjectionContainer;
 }

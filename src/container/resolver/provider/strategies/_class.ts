@@ -21,7 +21,7 @@ export class ClassProviderResolverStrategy implements ProviderResolverStrategy {
     const Instance = provider.useClass;
     const injects = this.#getInjectParameters(Instance);
 
-    const args = injects.map(({ token, optional }) => this.#container._resolveWithContext(token, optional, context));
+    const args = injects.map(({ token, optional }) => this.#container.resolveWithContext(token, optional, context));
     return new Instance(...args);
   }
 

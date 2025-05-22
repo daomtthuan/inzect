@@ -20,4 +20,11 @@ export enum Lifecycle {
    * Resolve the same instance only within the same resolution context.
    */
   Resolution,
+
+  /**
+   * Container scope.
+   *
+   * Resolve the same instance only within the same container.
+   */
+  Container,
 }

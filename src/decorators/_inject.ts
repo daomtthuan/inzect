@@ -97,5 +97,5 @@ function applyInjectClass<TTarget extends Class<unknown>, TType>(
  * @returns Return of Inject Field Decorator.
  */
 function applyInjectField<TType>(token: InjectionToken<TType>, optional: boolean): ReturnType<ClassFieldDecorator<TType, TType | undefined>> {
-  return () => Container._instance._resolveWithContext(token, optional);
+  return () => Container.instance.resolveWithContext(token, optional);
 }

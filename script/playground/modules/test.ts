@@ -13,3 +13,15 @@ export function expect(name: string, value: unknown, expected: unknown): void {
     console.error('  \x1b[31m%s\x1b[0m %s %o', 'Failed!', 'Expected:', expected);
   }
 }
+
+/**
+ * Perform test.
+ *
+ * @param test Test.
+ * @param options Options.
+ */
+export function performTest(test: () => void, options: { preTest?: () => void; postTest?: () => void } = {}): void {
+  options.preTest?.();
+  test();
+  options.postTest?.();
+}
