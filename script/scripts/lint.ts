@@ -12,10 +12,9 @@ export class LintScript extends ScriptBase {
 
   #lint(): void {
     console.log('> Linting...');
-    ChildProcess.spawnSync(`tsc --noEmit && eslint ./src --max-warnings 0`, {
+    ChildProcess.execSync(`tsc --noEmit && eslint ./src --max-warnings 0`, {
       cwd: this.rootDir,
       stdio: 'inherit',
-      shell: true,
     });
   }
 }

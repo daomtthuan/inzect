@@ -22,10 +22,9 @@ export class PackScript extends ScriptBase {
 
   #publish(): void {
     console.log('> Publishing...');
-    ChildProcess.spawnSync(`pnpm publish`, {
+    ChildProcess.execSync(`pnpm publish`, {
       cwd: this.distDir,
       stdio: 'inherit',
-      shell: true,
     });
   }
 }

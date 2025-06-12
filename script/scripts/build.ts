@@ -64,10 +64,9 @@ export class BuildScript extends ScriptBase {
 
   #build(): void {
     console.log('> Building...');
-    ChildProcess.spawnSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.distDir}" --strip-leading-paths`, {
+    ChildProcess.execSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.distDir}" --strip-leading-paths`, {
       cwd: this.rootDir,
       stdio: 'inherit',
-      shell: true,
     });
   }
 

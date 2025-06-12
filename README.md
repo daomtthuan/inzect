@@ -4,7 +4,7 @@
 [![npm](https://img.shields.io/npm/dt/inzect.svg)](https://www.npmjs.com/package/inzect)
 
 > **Inzect** is a lightweight injection container for TypeScript and JavaScript.\
-> It is built upon thee **[Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.
+> It is built upon **[Stage 3 Decorators Proposal](https://github.com/tc39/proposal-decorators)**.
 
 ## 📑 Table of contents
 
