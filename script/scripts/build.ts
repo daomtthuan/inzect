@@ -24,16 +24,16 @@ export class BuildScript extends ScriptBase {
 
   #cleanBuildDir(): void {
     console.log('> Cleaning build directory...');
-    if (FS.existsSync(this.buildDirPath)) {
-      FS.rmSync(this.buildDirPath, { recursive: true, force: true });
+    if (FS.existsSync(this.distDir)) {
+      FS.rmSync(this.distDir, { recursive: true, force: true });
     }
 
-    FS.mkdirSync(this.buildDirPath, { recursive: true });
+    FS.mkdirSync(this.distDir, { recursive: true });
   }
 
   #createBuildPackageJson(): void {
     console.log('> Creating build package.json...');
-    const buildPackageJsonPath = Path.join(this.buildDirPath, 'package.json');
+    const buildPackageJsonPath = Path.join(this.distDir, 'package.json');
 
     FS.writeFileSync(
       buildPackageJsonPath,
@@ -64,9 +64,10 @@ export class BuildScript extends ScriptBase {
 
   #build(): void {
     console.log('> Building...');
-    ChildProcess.execSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.buildDirPath}" --strip-leading-paths`, {
+    ChildProcess.spawnSync(`pnpm swc "./src" --config-file "./swc.config.json" --out-dir "${this.distDir}" --strip-leading-paths`, {
       cwd: this.rootDir,
       stdio: 'inherit',
+      shell: true,
     });
   }
 
@@ -74,7 +75,7 @@ export class BuildScript extends ScriptBase {
     console.log('> Copying files...');
     ['README.md', 'LICENSE'].forEach((fileName) => {
       const sourcePath = Path.join(this.rootDir, fileName);
-      const targetPath = Path.join(this.buildDirPath, fileName);
+      const targetPath = Path.join(this.distDir, fileName);
 
       FS.cpSync(sourcePath, targetPath);
     });

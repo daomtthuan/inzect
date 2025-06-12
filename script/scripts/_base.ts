@@ -10,7 +10,6 @@ export abstract class ScriptBase {
   readonly #distDir = Path.join(this.#rootDir, 'dist');
   readonly #packageJsonPath = Path.join(this.#rootDir, 'package.json');
   #packageJson?: PackageJson;
-  #buildDirPath?: string;
 
   /**
    * Run script.
@@ -40,12 +39,6 @@ export abstract class ScriptBase {
     return this.#packageJson;
   }
 
-  /** @returns Build directory path. */
-  protected get buildDirPath(): string {
-    this.#buildDirPath ??= this.#getBuildDirPath(this.packageJson);
-    return this.#buildDirPath;
-  }
-
   #getPackageJson(packageJsonPath: string): PackageJson {
     if (!FS.existsSync(packageJsonPath)) {
       throw new Error(`File 'package.json' not found`, {
@@ -54,15 +47,5 @@ export abstract class ScriptBase {
     }
 
     return JSON.parse(FS.readFileSync(packageJsonPath, 'utf-8'));
-  }
-
-  #getBuildDirPath(packageJson: PackageJson): string {
-    if (!packageJson.version) {
-      throw new Error(`Package version not found`, {
-        cause: { packageJson },
-      });
-    }
-
-    return Path.join(this.#distDir, packageJson.version);
   }
 }

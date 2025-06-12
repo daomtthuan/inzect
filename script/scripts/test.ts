@@ -2,17 +2,12 @@ import ChildProcess from 'child_process';
 import { Lifecycle, Scope } from 'inzect';
 import { ScriptBase } from './_base';
 
-/** Lint script. */
+/** Test script. */
 @Scope(Lifecycle.Singleton)
-export class LintScript extends ScriptBase {
+export class TestScript extends ScriptBase {
   /** @inheritdoc */
   public run(): void {
-    this.#lint();
-  }
-
-  #lint(): void {
-    console.log('> Linting...');
-    ChildProcess.spawnSync(`tsc --noEmit && eslint ./src --max-warnings 0`, {
+    ChildProcess.spawnSync(`pnpm vitest`, {
       cwd: this.rootDir,
       stdio: 'inherit',
       shell: true,
@@ -20,4 +15,4 @@ export class LintScript extends ScriptBase {
   }
 }
 
-export default LintScript;
+export default TestScript;

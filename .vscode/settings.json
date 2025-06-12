@@ -64,7 +64,7 @@
     "*.ts": "${capture}.type.ts",
     "*.tsx": "${capture}.type.ts",
     ".env": ".env*",
-    "package.json": ".editorconfig, .git*, pnpm-*.yaml, tsconfig.*, vite.config.*, prettier.config.*, eslint.config.*, swc.config.*, rollup.config.*, electron-builder.*, components.*, index.html"
+    "package.json": ".editorconfig, .git*, pnpm-*.yaml, tsconfig.*, vite.config.*, vitest.config.*, prettier.config.*, eslint.config.*, swc.config.*, rollup.config.*, electron-builder.*, components.*, index.html"
   },
   "files.associations": {
     "**/tsconfig/*.json": "jsonc",

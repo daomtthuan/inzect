@@ -26,8 +26,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "~examples/*": ["./examples/*"],
-      "~playground/*": ["./script/playground/*"]
+      "~test/*": ["./test/*"],
+      "~examples/*": ["./examples/*"]
     },
 
     // Emit
@@ -85,5 +85,5 @@
     // Completeness
     "skipLibCheck": true
   },
-  "include": ["./src", "./script", "./examples"]
+  "include": ["./src", "./test", "./script", "./examples"]
 }
