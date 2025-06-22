@@ -58,15 +58,15 @@ pnpm add inzect
 Please ensure that your `tsconfig.json` is configured to support Stage 3 decorators.\
 Specifically, **do not enable** `experimentalDecorators` or `emitDecoratorMetadata`, or simply omit them from the configuration:
 
-```json
+```jsonc
 // tsconfig.json
 
 {
   "compilerOptions": {
     // ...
     "experimentalDecorators": false,
-    "emitDecoratorMetadata": false
-  }
+    "emitDecoratorMetadata": false,
+  },
 }
 ```
 
