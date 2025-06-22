@@ -89,7 +89,20 @@ export class Container implements DependencyInjectionContainer {
   /** @inheritdoc */
   public resolve<TType>(token: InjectionToken<TType>, optional: boolean = false): TType | undefined {
     try {
-      return this.resolveWithContext(token, optional);
+      return this.resolveWithContext(token, optional, this.#context, false);
+    } finally {
+      this.#context.clearInstances();
+    }
+  }
+
+  /** @inheritdoc */
+  public async resolveAsync<TType>(token: InjectionToken<TType>, optional?: false): Promise<TType>;
+  /** @inheritdoc */
+  public async resolveAsync<TType>(token: InjectionToken<TType>, optional: true): Promise<TType | undefined>;
+  /** @inheritdoc */
+  public async resolveAsync<TType>(token: InjectionToken<TType>, optional: boolean = false): Promise<TType | undefined> {
+    try {
+      return await this.resolveWithContext(token, optional, this.#context, true);
     } finally {
       this.#context.clearInstances();
     }
@@ -98,20 +111,53 @@ export class Container implements DependencyInjectionContainer {
   /**
    * Resolve with context.
    *
+   * @overload
    * @param token Injection Token.
    * @param optional If `true`, returns `undefined` if the token is not registered.
    * @param context Resolution Context.
+   * @param isAsync Is resolve asynchronously.
    *
    * @returns Resolved instance.
    * @internal
    */
-  public resolveWithContext<TType>(token: InjectionToken<TType>, optional: boolean, context: ResolutionContext = this.#context): TType | undefined {
+  public resolveWithContext<TType>(token: InjectionToken<TType>, optional: boolean, context?: ResolutionContext, isAsync?: false): TType | undefined;
+  /**
+   * Resolve with context asynchronously.
+   *
+   * @overload
+   * @param token Injection Token.
+   * @param optional If `true`, returns `undefined` if the token is not registered.
+   * @param context Resolution Context.
+   * @param isAsync Is resolve asynchronously.
+   *
+   * @returns Resolved instance.
+   * @internal
+   */
+  public resolveWithContext<TType>(token: InjectionToken<TType>, optional: boolean, context?: ResolutionContext, isAsync?: true): Promise<TType | undefined>;
+  /**
+   * Resolve with context.
+   *
+   * @overload
+   * @param token Injection Token.
+   * @param optional If `true`, returns `undefined` if the token is not registered.
+   * @param context Resolution Context.
+   * @param isAsync Is resolve asynchronously.
+   *
+   * @returns Resolved instance.
+   * @internal
+   */
+  public resolveWithContext<TType>(
+    token: InjectionToken<TType>,
+    optional: boolean,
+    context: ResolutionContext = this.#context,
+    isAsync: boolean = false,
+  ): TType | undefined | Promise<TType | undefined> {
     const registration = this.lookupRegistration(token);
     if (!registration) {
-      return this.#resolver.resolveUnregistered(token, optional, context);
+      return this.#resolver.resolveUnregistered(token, optional, context, isAsync);
     }
 
-    return this.#resolver.resolveRegistration(token, registration, context);
+    return this.#resolver.resolveRegistration(token, registration, context, isAsync);
   }
 
   /**

@@ -10,8 +10,7 @@ import type { RegisterOptionsBase } from './_base';
  * @template TInjectParameters Inject parameter types.
  */
 export type FactoryRegisterOptions<TType, TDependencies extends unknown[], TInjectParameters extends InjectParameter<unknown>[]> = RegisterOptionsBase<
-  TType,
-  FactoryInjectionProvider<TType, TDependencies, TInjectParameters>,
+  FactoryInjectionProvider<TType | Promise<TType>, TDependencies, TInjectParameters>,
   TDependencies,
   TInjectParameters
 >;

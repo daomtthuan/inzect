@@ -3,6 +3,7 @@ import type { ProviderResolverStrategy, ResolutionContext } from '~/types/contai
 import type { Class } from '~/types/core';
 import type { NormalizedInjectParameter } from '~/types/injector';
 import type { ClassInjectionProvider } from '~/types/provider';
+import type { InjectionToken } from '~/types/token';
 
 import { MetadataKey } from '~/constants';
 import { InjectorHelper } from '~/helpers';
@@ -17,12 +18,26 @@ export class ClassProviderResolverStrategy implements ProviderResolverStrategy {
   }
 
   /** @inheritdoc */
-  public resolve<TType>(provider: ClassInjectionProvider<TType>, context: ResolutionContext): TType {
+  public resolve<TType>(
+    _token: InjectionToken<TType>,
+    provider: ClassInjectionProvider<TType>,
+    context: ResolutionContext,
+    isAsync: boolean,
+  ): TType | Promise<TType> {
     const Instance = provider.useClass;
     const injects = this.#getInjectParameters(Instance);
 
-    const args = injects.map(({ token, optional }) => this.#container.resolveWithContext(token, optional, context));
-    return new Instance(...args);
+    // Resolve synchronously
+    if (!isAsync) {
+      const args = injects.map(({ token, optional }) => this.#container.resolveWithContext(token, optional, context, false));
+      return new Instance(...args);
+    }
+
+    // Resolve asynchronously
+    return (async () => {
+      const args = await Promise.all(injects.map(async ({ token, optional }) => this.#container.resolveWithContext(token, optional, context, true)));
+      return new Instance(...args);
+    })();
   }
 
   #getInjectParameters<TType>(constructor: Class<TType>): NormalizedInjectParameter<TType>[] {

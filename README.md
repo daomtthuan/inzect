@@ -21,6 +21,7 @@
     - [`container.isRegistered()`](#containerisregistered)
     - [`container.clear()`](#containerclear)
     - [`container.resolve()`](#containerresolve)
+    - [`container.resolveAsync()`](#containerresolveasync)
     - [`container.createChild()`](#containercreatechild)
   - [Injection](#injection)
     - [Token](#token)
@@ -339,6 +340,45 @@ container.register({
 
 const logger = container.resolve<Logger>(LOGGER_TOKEN);
 logger.log('Hello world!');
+```
+
+#### `container.resolveAsync()`
+
+Resolves a class or token asynchronously. This method is required when any of the class's dependencies (constructor parameters) are registered using asynchronous factory providers.
+Unlike `resolve()`, which works only with synchronous resolution chains, `resolveAsync()` ensures proper handling of nested or recursive dependencies that rely on asynchronous instantiation.
+
+**Parameters**
+
+- `token` — Injection Token (see [Token](#token)).
+- `optional` (**default**: `false`) — Whether the dependency is optional.
+
+**Usage**
+
+```ts
+// index.ts
+
+import { container } from 'inzect';
+
+const TIMESTAMP_TOKEN = Symbol('data');
+
+// Fake async data
+function fetchTimestamp(): Promise<number> {
+  return new Promise<number>((resolve) => {
+    setTimeout(() => {
+      resolve(Date.now());
+    }, 1000);
+  });
+}
+
+container.register({
+  token: TIMESTAMP_TOKEN,
+  provider: {
+    useFactory: fetchTimestamp,
+  },
+});
+
+const data = await container.resolveAsync(TIMESTAMP_TOKEN);
+console.log(data); // Current timestamp
 ```
 
 #### `container.createChild()`

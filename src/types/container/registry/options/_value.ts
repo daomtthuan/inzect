@@ -6,4 +6,4 @@ import type { RegisterOptionsBase } from './_base';
  *
  * @template TType Type of instance.
  */
-export type ValueRegisterOptions<TType> = RegisterOptionsBase<TType, ValueInjectionProvider<TType>>;
+export type ValueRegisterOptions<TType> = RegisterOptionsBase<ValueInjectionProvider<TType>>;

@@ -77,6 +77,10 @@ export class TokenHelper {
    * @returns Stringified token.
    */
   public static stringify<TType>(token: InjectionToken<TType>): string {
+    if (typeof token === 'symbol') {
+      return token.toString();
+    }
+
     if (TokenHelper.isPrimitiveInjectionToken(token)) {
       return JSON.stringify(token);
     }

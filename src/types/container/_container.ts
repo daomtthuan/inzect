@@ -72,7 +72,7 @@ export interface DependencyInjectionContainer {
    */
   resolve<TType>(token: InjectionToken<TType>, optional?: false): TType;
   /**
-   * Optional Resolves a dependency.\
+   * Optional Resolve a dependency.\
    * Return `undefined` if the token is not registered.
    *
    * @overload
@@ -83,4 +83,28 @@ export interface DependencyInjectionContainer {
    * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
    */
   resolve<TType>(token: InjectionToken<TType>, optional: true): TType | undefined;
+
+  /**
+   * Resolve a dependency asynchronously.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
+   * @param token Injection Token.
+   * @param optional If `true`, returns `undefined` if the token is not registered.
+   *
+   * @returns Resolved instance.
+   */
+  resolveAsync<TType>(token: InjectionToken<TType>, optional?: false): Promise<TType>;
+  /**
+   * Optional Resolve a dependency asynchronously.\
+   * Return `undefined` if the token is not registered.
+   *
+   * @overload
+   * @template TType Type of instance to resolve.
+   * @param token Injection Token.
+   * @param optional If `true`, returns `undefined` if the token is not registered.
+   *
+   * @returns If the token is not registered, `undefined`, otherwise Resolved instance.
+   */
+  resolveAsync<TType>(token: InjectionToken<TType>, optional: true): Promise<TType | undefined>;
 }

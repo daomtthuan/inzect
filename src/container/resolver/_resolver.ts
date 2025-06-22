@@ -25,7 +25,8 @@ export class Resolver implements DependencyInjectionResolver {
     token: InjectionToken<TType>,
     registration: Registration<TType, TDependencies, TInjectParameters>,
     context: ResolutionContext,
-  ): TType {
+    isAsync: boolean,
+  ): TType | Promise<TType> {
     const lifecycleResolver = this.#lifecycleResolverFactory.get(registration.scope);
     const result = lifecycleResolver.resolve(token, registration, context);
     if (result.isResolved) {
@@ -33,14 +34,29 @@ export class Resolver implements DependencyInjectionResolver {
     }
 
     const providerResolver = this.#providerResolverFactory.get(registration.provider);
-    const instance = providerResolver.resolve(registration.provider, context);
-    lifecycleResolver.store(token, registration, context, instance);
 
-    return instance;
+    // Resolve synchronously
+    if (!isAsync) {
+      const instance = providerResolver.resolve(token, registration.provider, context, false);
+      lifecycleResolver.store(token, registration, context, instance);
+      return instance;
+    }
+
+    // Resolve asynchronously
+    return (async () => {
+      const instance = await providerResolver.resolve(token, registration.provider, context, true);
+      lifecycleResolver.store(token, registration, context, instance);
+      return instance;
+    })();
   }
 
   /** @inheritdoc */
-  public resolveUnregistered<TType>(token: InjectionToken<TType>, optional: boolean, context: ResolutionContext): TType | undefined {
+  public resolveUnregistered<TType>(
+    token: InjectionToken<TType>,
+    optional: boolean,
+    context: ResolutionContext,
+    isAsync: boolean,
+  ): TType | undefined | Promise<TType | undefined> {
     if (TokenHelper.isPrimitiveInjectionToken(token)) {
       if (optional) {
         return undefined;
@@ -59,7 +75,14 @@ export class Resolver implements DependencyInjectionResolver {
       };
 
       const providerResolver = this.#providerResolverFactory.get(provider);
-      return providerResolver.resolve(provider, context);
+
+      // Resolve synchronously
+      if (!isAsync) {
+        return providerResolver.resolve(token, provider, context, false);
+      }
+
+      // Resolve asynchronously
+      return providerResolver.resolve(token, provider, context, true);
     }
 
     throw new ResolutionError({

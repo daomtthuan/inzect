@@ -21,6 +21,7 @@
     - [`container.isRegistered()`](#containerisregistered)
     - [`container.clear()`](#containerclear)
     - [`container.resolve()`](#containerresolve)
+    - [`container.resolveAsync()`](#containerresolveasync)
     - [`container.createChild()`](#containercreatechild)
   - [Injection](#injection)
     - [Token](#token)
@@ -241,6 +242,24 @@ Resolves a dependency.
 // index.ts
 
 __[EXAMPLE](/examples/container/resolve.ts)__
+```
+
+#### `container.resolveAsync()`
+
+Resolves a class or token asynchronously. This method is required when any of the class's dependencies (constructor parameters) are registered using asynchronous factory providers.
+Unlike `resolve()`, which works only with synchronous resolution chains, `resolveAsync()` ensures proper handling of nested or recursive dependencies that rely on asynchronous instantiation.
+
+**Parameters**
+
+- `token` — Injection Token (see [Token](#token)).
+- `optional` (**default**: `false`) — Whether the dependency is optional.
+
+**Usage**
+
+```ts
+// index.ts
+
+__[EXAMPLE](/examples/container/resolve-async.ts)__
 ```
 
 #### `container.createChild()`

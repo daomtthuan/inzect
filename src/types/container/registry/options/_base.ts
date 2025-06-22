@@ -6,19 +6,17 @@ import type { InjectionToken } from '~/types/token';
 /**
  * Register Options Base.
  *
- * @template TType Type of instance.
  * @template TProvider Injection Provider.
  * @template TDependencies Dependencies types.
  * @template TInjectParameters Inject parameter types.
  */
 export type RegisterOptionsBase<
-  TType,
-  TProvider extends InjectionProvider<TType, TDependencies, TInjectParameters>,
+  TProvider extends InjectionProvider<unknown, TDependencies, TInjectParameters>,
   TDependencies extends unknown[] = never,
   TInjectParameters extends InjectParameter<unknown>[] = never,
 > = {
   /** Injection Token. */
-  token: InjectionToken<TType>;
+  token: InjectionToken<unknown>;
 
   /** Injection Provider. */
   provider: TProvider;
